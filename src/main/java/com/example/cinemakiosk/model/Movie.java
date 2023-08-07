@@ -3,6 +3,8 @@ package com.example.cinemakiosk.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.type.descriptor.jdbc.VarbinaryJdbcType;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -18,19 +20,27 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Lob
+    @JdbcType(VarbinaryJdbcType.class)
+    private byte[] img;
+
     private String name;
+
+    @Column(length = 5000)
     private String description;
 
     private Integer durationMins;
+    private Float score;
 
     @Temporal(TemporalType.DATE)
     private Date releaseDate;
 
+    // TODO: non elegantissimo, possibili attori doppioni (vedi genres)
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "actors_movies", joinColumns = { @JoinColumn(name = "movie_id") }, inverseJoinColumns = { @JoinColumn(name = "actor_id") })
     private Set<Actor> actors = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "genres_movies", joinColumns = { @JoinColumn(name = "movie_id") }, inverseJoinColumns = { @JoinColumn(name = "actor_id") })
+    @ManyToMany(fetch = FetchType.LAZY)//, cascade = CascadeType.ALL)
+    @JoinTable(name = "genres_movies", joinColumns = { @JoinColumn(name = "movie_id") }, inverseJoinColumns = { @JoinColumn(name = "genre_id") })
     private Set<MovieGenre> genres = new HashSet<>();
 }
