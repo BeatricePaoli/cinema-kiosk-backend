@@ -44,15 +44,15 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
                     predicates.add(builder.equal(root.get(Movie_.id), movieShow.get(Movie_.id)));
 
                     if (dto.getCity() != null) {
-                        predicates.add(builder.like(address.get(Address_.city), "%" + dto.getCity() + "%"));
+                        predicates.add(builder.like(builder.lower(address.get(Address_.city)), "%" + dto.getCity().toLowerCase() + "%"));
                     }
                     if (dto.getCinema() != null) {
-                        predicates.add(builder.like(theater.get(Theater_.name), "%" + dto.getCinema() + "%"));
+                        predicates.add(builder.like(builder.lower(theater.get(Theater_.name)), "%" + dto.getCinema().toLowerCase() + "%"));
                     }
                 }
 
                 if (dto.getMovie() != null) {
-                    predicates.add(builder.like(root.get(Movie_.name), "%" + dto.getMovie() + "%"));
+                    predicates.add(builder.like(builder.lower(root.get(Movie_.name)), "%" + dto.getMovie().toLowerCase() + "%"));
                 }
 
                 if (!searchCurrent) {
