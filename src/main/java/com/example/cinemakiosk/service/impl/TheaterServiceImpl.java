@@ -8,6 +8,7 @@ import com.example.cinemakiosk.service.TheaterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,8 +20,14 @@ public class TheaterServiceImpl implements TheaterService {
     private TheaterRepository theaterRepository;
 
     @Override
-    public TheaterFilterDto getFilters() {
-        List<Theater> theaters = theaterRepository.findAll();
+    public TheaterFilterDto getFilters(Long movieId) {
+        List<Theater> theaters;
+        if (movieId == null) {
+            theaters = theaterRepository.findAll();
+        } else {
+            theaters = theaterRepository.findWithFutureShow(movieId);
+        }
+
         Map<String, List<Theater>> grouped = theaters.stream()
                 .collect(Collectors.groupingBy(theater -> theater.getAddress().getCity()));
 
