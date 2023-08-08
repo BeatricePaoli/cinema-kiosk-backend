@@ -1,11 +1,9 @@
 package com.example.cinemakiosk.configuration;
 
-import com.example.cinemakiosk.model.Actor;
-import com.example.cinemakiosk.model.Movie;
-import com.example.cinemakiosk.model.MovieGenre;
-import com.example.cinemakiosk.repository.MovieGenreRepository;
-import com.example.cinemakiosk.repository.MovieRepository;
+import com.example.cinemakiosk.model.*;
+import com.example.cinemakiosk.repository.*;
 import com.example.cinemakiosk.utils.DateUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +25,22 @@ public class DBinit {
     @Autowired
     private MovieGenreRepository movieGenreRepository;
 
+    @Autowired
+    private TheaterRepository theaterRepository;
+
+    @Autowired
+    private ShowRepository showRepository;
+
+    @Autowired
+    private ScreenRepository screenRepository;
+
     @PostConstruct
     public void init() throws IOException {
 
 //        movieRepository.deleteAll();
 //        movieGenreRepository.deleteAll();
+//        showRepository.deleteAll();
+//        theaterRepository.deleteAll();
 
         List<MovieGenre> genres = movieGenreRepository.findAll();
         if (genres.isEmpty()) {
@@ -118,6 +127,79 @@ public class DBinit {
             movies.add(m3);
 
             movieRepository.saveAll(movies);
+        }
+
+        List<Theater> theaters = theaterRepository.findAll();
+        if (theaters.isEmpty()) {
+            Theater t = new Theater();
+            t.setName("Cinema Test");
+
+            Address a = new Address();
+            a.setCity("Firenze");
+            a.setCountry("Italia");
+            a.setStreet("Via Pinco Pallino");
+            a.setNumber("5");
+            a.setZipCode("00100");
+            t.setAddress(a);
+
+            Screen s = new Screen();
+            s.setName("Sala 1");
+            s.setEmitterSerial("AB12");
+            s.setTheater(t);
+            List<Seat> seats = new ArrayList<>();
+            for(char c = 'A'; c <= 'J'; ++c) {
+                for (int i = 0; i < 21; i++) {
+                    Seat seat = new Seat();
+                    seat.setRow(String.valueOf(c));
+                    seat.setCol(String.valueOf(i + 1));
+                    seat.setScreen(s);
+                    seats.add(seat);
+                }
+            }
+            s.setSeats(seats);
+            File file = ResourceUtils.getFile("classpath:static/json/screen_test.json");
+            Map<String,Object> seatChart = new ObjectMapper().readValue(file, HashMap.class);
+            s.setSeatChart(seatChart);
+            t.setScreens(Collections.singletonList(s));
+
+            TicketType t1 = new TicketType();
+            t1.setName("Adulti");
+            t1.setAvailableOnline(true);
+            t1.setPrice(9d);
+            t1.setProjectionType(ProjectionType.is2D);
+            t1.setDays(Arrays.asList(Day.values()));
+            TicketType t2 = new TicketType();
+            t2.setName("Bambini");
+            t2.setAvailableOnline(true);
+            t2.setPrice(7d);
+            t2.setProjectionType(ProjectionType.is2D);
+            t2.setDays(Arrays.asList(Day.values()));
+            t.setTicketTypes(Arrays.asList(t1, t2));
+
+            theaterRepository.save(t);
+
+            Movie movie = movieRepository.findByName("Spider-man: Across the Spiderverse").get(0);
+            Screen screen = screenRepository.findAll().get(0);
+
+            Show show = new Show();
+            show.setDate(DateUtils.convertToDate(LocalDate.of(2023, 12, 12)));
+            show.setProjectionType(ProjectionType.is2D);
+            show.setLanguage("Italiano");
+            show.setStartTime("16:30");
+            show.setMovie(movie);
+            show.setScreen(screen);
+
+            showRepository.save(show);
+
+            Show show2 = new Show();
+            show2.setDate(DateUtils.convertToDate(LocalDate.of(2023, 12, 12)));
+            show2.setProjectionType(ProjectionType.is2D);
+            show2.setLanguage("Italiano");
+            show2.setStartTime("19:30");
+            show2.setMovie(movie);
+            show2.setScreen(screen);
+
+            showRepository.save(show2);
         }
     }
 

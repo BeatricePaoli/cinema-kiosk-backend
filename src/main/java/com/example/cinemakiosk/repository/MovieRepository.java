@@ -17,6 +17,8 @@ import java.util.Optional;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecificationExecutor<Movie> {
 
+    List<Movie> findByName(String name);
+
     @Query("FROM Movie m LEFT JOIN FETCH m.actors LEFT JOIN FETCH m.genres WHERE m.id = :id")
     Optional<Movie> findByIdWithFetch(Long id);
 
@@ -42,6 +44,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
                     Join<Theater, Address> address = theater.join(Theater_.address);
 
                     predicates.add(builder.equal(root.get(Movie_.id), movieShow.get(Movie_.id)));
+                    predicates.add(builder.greaterThanOrEqualTo(show.get(Show_.date), new Date()));
 
                     if (dto.getCity() != null) {
                         predicates.add(builder.like(builder.lower(address.get(Address_.city)), "%" + dto.getCity().toLowerCase() + "%"));
@@ -49,14 +52,14 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
                     if (dto.getCinema() != null) {
                         predicates.add(builder.like(builder.lower(theater.get(Theater_.name)), "%" + dto.getCinema().toLowerCase() + "%"));
                     }
+
+                    query.distinct(true);
+                } else {
+                    predicates.add(builder.greaterThanOrEqualTo(root.get(Movie_.releaseDate), new Date()));
                 }
 
                 if (dto.getMovie() != null) {
                     predicates.add(builder.like(builder.lower(root.get(Movie_.name)), "%" + dto.getMovie().toLowerCase() + "%"));
-                }
-
-                if (!searchCurrent) {
-                    predicates.add((builder.greaterThanOrEqualTo(root.get(Movie_.releaseDate), new Date())));
                 }
 
                 return builder.and(predicates.toArray(new Predicate[0]));
