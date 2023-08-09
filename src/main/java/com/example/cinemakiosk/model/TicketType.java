@@ -18,8 +18,6 @@ public class TicketType {
 
     private String name;
     private Double price;
-
-    @Enumerated(EnumType.STRING)
     private ProjectionType projectionType;
 
     private Boolean availableOnline;

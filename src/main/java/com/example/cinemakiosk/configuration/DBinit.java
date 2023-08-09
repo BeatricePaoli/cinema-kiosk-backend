@@ -34,7 +34,7 @@ public class DBinit {
     @Autowired
     private ScreenRepository screenRepository;
 
-    @PostConstruct
+//    @PostConstruct
     public void init() throws IOException {
 
 //        movieRepository.deleteAll();
@@ -168,12 +168,14 @@ public class DBinit {
             t1.setPrice(9d);
             t1.setProjectionType(ProjectionType.is2D);
             t1.setDays(Arrays.asList(Day.values()));
+            t1.setTheater(t);
             TicketType t2 = new TicketType();
             t2.setName("Bambini");
             t2.setAvailableOnline(true);
             t2.setPrice(7d);
             t2.setProjectionType(ProjectionType.is2D);
             t2.setDays(Arrays.asList(Day.values()));
+            t2.setTheater(t);
             t.setTicketTypes(Arrays.asList(t1, t2));
 
             theaterRepository.save(t);

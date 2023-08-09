@@ -21,8 +21,6 @@ public class Show {
 
     private String startTime;
     private String language;
-
-    @Enumerated(EnumType.STRING)
     private ProjectionType projectionType;
 
     @ManyToOne
