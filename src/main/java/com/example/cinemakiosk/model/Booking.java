@@ -18,7 +18,6 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private Integer numSeats;
     private Double price;
 
     @Temporal(TemporalType.DATE)
@@ -32,7 +31,7 @@ public class Booking {
     private Show show;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "seats_show", joinColumns = { @JoinColumn(name = "show_id") }, inverseJoinColumns = { @JoinColumn(name = "seat_id") })
+    @JoinTable(name = "seats_booking", joinColumns = { @JoinColumn(name = "booking_id") }, inverseJoinColumns = { @JoinColumn(name = "seat_id") })
     private Set<Seat> seats = new HashSet<>();
 
     @ManyToOne
