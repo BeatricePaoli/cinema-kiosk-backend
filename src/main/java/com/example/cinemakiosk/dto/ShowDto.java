@@ -6,6 +6,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class ShowDto {
@@ -16,6 +17,7 @@ public class ShowDto {
     private ProjectionType projectionType;
     private MovieDto movie;
     private ScreenDto screen;
+    private List<SeatDto> seatsTaken;
 
     public static ShowDto toDto(Show show) {
         ShowDto dto = new ShowDto();

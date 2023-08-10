@@ -23,7 +23,7 @@ public class TheaterServiceImpl implements TheaterService {
     public TheaterFilterDto getFilters(Long movieId) {
         List<Theater> theaters;
         if (movieId == null) {
-            theaters = theaterRepository.findAll();
+            theaters = theaterRepository.findAllWithFetch();
         } else {
             theaters = theaterRepository.findWithFutureShow(movieId);
         }

@@ -10,9 +10,13 @@ import java.util.List;
 @Repository
 public interface TheaterRepository extends JpaRepository<Theater, Long> {
 
+    @Query("SELECT t FROM Theater t JOIN FETCH t.address")
+    List<Theater> findAllWithFetch();
+
     @Query("SELECT DISTINCT t FROM Show s " +
             "JOIN s.movie m " +
             "JOIN s.screen.theater t " +
+            "JOIN FETCH t.address " +
             "WHERE s.date >= CURRENT_DATE " +
             "AND (:movieId IS NULL OR m.id = :movieId)")
     List<Theater> findWithFutureShow(Long movieId);
