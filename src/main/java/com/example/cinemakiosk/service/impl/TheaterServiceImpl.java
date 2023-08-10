@@ -2,6 +2,7 @@ package com.example.cinemakiosk.service.impl;
 
 import com.example.cinemakiosk.dto.CityFilterDto;
 import com.example.cinemakiosk.dto.TheaterFilterDto;
+import com.example.cinemakiosk.dto.TicketTypeDto;
 import com.example.cinemakiosk.model.Theater;
 import com.example.cinemakiosk.repository.TheaterRepository;
 import com.example.cinemakiosk.service.TheaterService;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +38,15 @@ public class TheaterServiceImpl implements TheaterService {
                     .map(Theater::getName).collect(Collectors.toList());
             return new CityFilterDto(entry.getKey(), theatersNames);
         }).collect(Collectors.toList());
-
         return new TheaterFilterDto(cityFilters);
+    }
+
+    @Override
+    public List<TicketTypeDto> getTicketTypes(Long id) {
+        Optional<Theater> theaterOpt = theaterRepository.findById(id);
+        if (theaterOpt.isPresent()) {
+            return theaterOpt.get().getTicketTypes().stream().map(TicketTypeDto::toDto).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
     }
 }
