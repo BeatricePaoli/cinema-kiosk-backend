@@ -11,5 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 public class CityFilterDto {
     private String name;
-    private List<String> theaters;
+    private List<TheaterFilterDto> theaters;
 }

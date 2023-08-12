@@ -22,15 +22,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
     @Query("FROM Movie m LEFT JOIN FETCH m.actors LEFT JOIN FETCH m.genres WHERE m.id = :id")
     Optional<Movie> findByIdWithFetch(Long id);
 
-//    @Query("SELECT m FROM Show s " +
-//            "JOIN s.movie m " +
-//            "JOIN s.screen.theater t " +
-//            "WHERE s.date >= CURRENT_DATE " +
-//            "AND (:movie IS NULL OR m.name LIKE '%' || :movie || '%') " +
-//            "AND (:cinema IS NULL OR t.name LIKE '%' || :cinema || '%') " +
-//            "AND (:city IS NULL OR t.address.city LIKE '%' || :city || '%') ")
-//    List<Movie> search(String movie, String city, String cinema);
-
     static Specification<Movie> search(MovieFilterDto dto, boolean searchCurrent) {
         return new Specification<>() {
             public Predicate toPredicate(Root<Movie> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
@@ -49,8 +40,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
                     if (dto.getCity() != null) {
                         predicates.add(builder.like(builder.lower(address.get(Address_.city)), "%" + dto.getCity().toLowerCase() + "%"));
                     }
-                    if (dto.getCinema() != null) {
-                        predicates.add(builder.like(builder.lower(theater.get(Theater_.name)), "%" + dto.getCinema().toLowerCase() + "%"));
+                    if (dto.getTheaterId() != null) {
+                        predicates.add(builder.equal(theater.get(Theater_.id), dto.getTheaterId()));
                     }
 
                     query.distinct(true);

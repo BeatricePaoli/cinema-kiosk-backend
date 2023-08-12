@@ -15,7 +15,7 @@ public interface ShowRepository extends JpaRepository<Show, Long> {
             "JOIN s.screen.theater t " +
             "WHERE s.date >= CURRENT_DATE " +
             "AND m.id = :movieId " +
-            "AND t.name LIKE '%' || :cinema || '%' " +
+            "AND t.id = :theaterId " +
             "AND t.address.city LIKE '%' || :city || '%' ")
-    List<Show> search(Long movieId, String city, String cinema);
+    List<Show> search(Long movieId, String city, Long theaterId);
 }

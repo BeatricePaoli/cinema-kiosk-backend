@@ -1,6 +1,6 @@
 package com.example.cinemakiosk.controller;
 
-import com.example.cinemakiosk.dto.TheaterFilterDto;
+import com.example.cinemakiosk.dto.AutocompleteTheaterFilterDto;
 import com.example.cinemakiosk.dto.TicketTypeDto;
 import com.example.cinemakiosk.service.TheaterService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class TheaterController {
 
     @GetMapping("/filter")
     public ResponseEntity<?> getFilters(@RequestParam(value = "movieId", required = false) Long movieId) {
-        TheaterFilterDto result = theaterService.getFilters(movieId);
+        AutocompleteTheaterFilterDto result = theaterService.getFilters(movieId);
         return ResponseEntity.ok(result);
     }
 

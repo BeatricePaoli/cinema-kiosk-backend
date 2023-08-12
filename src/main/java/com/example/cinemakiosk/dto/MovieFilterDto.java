@@ -6,5 +6,5 @@ import lombok.Data;
 public class MovieFilterDto {
     private String movie;
     private String city;
-    private String cinema;
+    private Long theaterId;
 }

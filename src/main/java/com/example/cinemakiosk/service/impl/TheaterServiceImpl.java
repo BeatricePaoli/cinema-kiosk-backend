@@ -1,5 +1,6 @@
 package com.example.cinemakiosk.service.impl;
 
+import com.example.cinemakiosk.dto.AutocompleteTheaterFilterDto;
 import com.example.cinemakiosk.dto.CityFilterDto;
 import com.example.cinemakiosk.dto.TheaterFilterDto;
 import com.example.cinemakiosk.dto.TicketTypeDto;
@@ -22,7 +23,7 @@ public class TheaterServiceImpl implements TheaterService {
     private TheaterRepository theaterRepository;
 
     @Override
-    public TheaterFilterDto getFilters(Long movieId) {
+    public AutocompleteTheaterFilterDto getFilters(Long movieId) {
         List<Theater> theaters;
         if (movieId == null) {
             theaters = theaterRepository.findAllWithFetch();
@@ -34,11 +35,11 @@ public class TheaterServiceImpl implements TheaterService {
                 .collect(Collectors.groupingBy(theater -> theater.getAddress().getCity()));
 
         List<CityFilterDto> cityFilters = grouped.entrySet().stream().map(entry -> {
-            List<String> theatersNames = entry.getValue().stream()
-                    .map(Theater::getName).collect(Collectors.toList());
+            List<TheaterFilterDto> theatersNames = entry.getValue().stream()
+                    .map(t -> new TheaterFilterDto(t.getId(), t.getName())).collect(Collectors.toList());
             return new CityFilterDto(entry.getKey(), theatersNames);
         }).collect(Collectors.toList());
-        return new TheaterFilterDto(cityFilters);
+        return new AutocompleteTheaterFilterDto(cityFilters);
     }
 
     @Override

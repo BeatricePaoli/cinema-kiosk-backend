@@ -27,7 +27,7 @@ public class ShowServiceImpl implements ShowService {
 
     @Override
     public List<ShowDto> search(ShowFilterDto dto) {
-        List<Show> shows = showRepository.search(dto.getMovieId(), dto.getCity(), dto.getCinema());
+        List<Show> shows = showRepository.search(dto.getMovieId(), dto.getCity(), dto.getTheaterId());
 
         if (!shows.isEmpty()) {
             List<SeatTakenDto> seatsTaken;
