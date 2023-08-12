@@ -5,15 +5,15 @@ import com.example.cinemakiosk.dto.CityFilterDto;
 import com.example.cinemakiosk.dto.TheaterFilterDto;
 import com.example.cinemakiosk.dto.TicketTypeDto;
 import com.example.cinemakiosk.model.Theater;
+import com.example.cinemakiosk.model.TicketType;
 import com.example.cinemakiosk.repository.TheaterRepository;
+import com.example.cinemakiosk.repository.TicketTypeRepository;
 import com.example.cinemakiosk.service.TheaterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +21,9 @@ public class TheaterServiceImpl implements TheaterService {
 
     @Autowired
     private TheaterRepository theaterRepository;
+
+    @Autowired
+    private TicketTypeRepository ticketTypeRepository;
 
     @Override
     public AutocompleteTheaterFilterDto getFilters(Long movieId) {
@@ -44,10 +47,7 @@ public class TheaterServiceImpl implements TheaterService {
 
     @Override
     public List<TicketTypeDto> getTicketTypes(Long id) {
-        Optional<Theater> theaterOpt = theaterRepository.findById(id);
-        if (theaterOpt.isPresent()) {
-            return theaterOpt.get().getTicketTypes().stream().map(TicketTypeDto::toDto).collect(Collectors.toList());
-        }
-        return new ArrayList<>();
+        List<TicketType> ticketTypes = ticketTypeRepository.getByTheater(id);
+        return ticketTypes.stream().map(TicketTypeDto::toDto).collect(Collectors.toList());
     }
 }
