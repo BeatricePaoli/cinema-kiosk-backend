@@ -34,12 +34,16 @@ public class DBinit {
     @Autowired
     private ScreenRepository screenRepository;
 
+    @Autowired
+    private BookingRepository bookingRepository;
+
 //    @PostConstruct
     public void init() throws IOException {
 
+//        bookingRepository.deleteAll();
+//        showRepository.deleteAll();
 //        movieRepository.deleteAll();
 //        movieGenreRepository.deleteAll();
-//        showRepository.deleteAll();
 //        theaterRepository.deleteAll();
 
         List<MovieGenre> genres = movieGenreRepository.findAll();
@@ -72,7 +76,6 @@ public class DBinit {
         }
 
         List<Movie> movies = movieRepository.findAll();
-
         if (movies.isEmpty()) {
             Movie m = new Movie();
             m.setName("Spider-man: Across the Spiderverse");

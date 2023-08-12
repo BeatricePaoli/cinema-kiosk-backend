@@ -6,5 +6,6 @@ public enum Day {
     WED,
     THU,
     FRI,
-    SAT
+    SAT,
+    SUN,
 }
