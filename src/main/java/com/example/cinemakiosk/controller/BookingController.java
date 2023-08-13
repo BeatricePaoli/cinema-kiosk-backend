@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/bookings")
@@ -28,6 +29,16 @@ public class BookingController {
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(bookingId);
+    }
+
+    // TODO: user filter
+    @GetMapping
+    public ResponseEntity<?> getBookings() {
+        List<BookingDto> result = bookingService.getBookings();
+        if (result.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")

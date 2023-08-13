@@ -91,39 +91,45 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public List<BookingDto> getBookings() {
+        List<Booking> bookings = bookingRepository.getBookings();
+        return bookings.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @Override
     public BookingDto getById(Long id) {
         Optional<Booking> bookingOpt = bookingRepository.findByIdWithFetch(id);
-        if (bookingOpt.isPresent()) {
-            Booking booking = bookingOpt.get();
-            Show show = booking.getShow();
-            Movie movie = show.getMovie();
-            Theater theater = show.getScreen().getTheater();
-
-            BookingDto dto = new BookingDto();
-            dto.setId(booking.getId());
-            dto.setPrice(booking.getPrice());
-            dto.setShowId(show.getId());
-            dto.setDate(show.getDate());
-            dto.setStartTime(show.getStartTime());
-
-            dto.setTheater(TheaterDto.toDto(theater));
-            dto.setCity(theater.getAddress().getCity());
-
-            dto.setMovie(MovieDto.toDto(movie));
-
-            List<SeatDto> seats = booking.getSeats().stream().map(s -> new SeatDto(s.getId(), s.getLabel()))
-                    .collect(Collectors.toList());
-            dto.setSeats(seats);
-
-            dto.setCodeUrl(baseUrl + "/api/bookings/code/" + booking.getId());
-
-            return dto;
-        }
-        return null;
+        return bookingOpt.map(this::toDto).orElse(null);
     }
 
     @Override
     public Boolean isBookingValid(Long id) {
         return bookingRepository.findById(id).isPresent();
+    }
+
+    private BookingDto toDto(Booking booking) {
+        Show show = booking.getShow();
+        Movie movie = show.getMovie();
+        Theater theater = show.getScreen().getTheater();
+
+        BookingDto dto = new BookingDto();
+        dto.setId(booking.getId());
+        dto.setPrice(booking.getPrice());
+        dto.setShowId(show.getId());
+        dto.setDate(show.getDate());
+        dto.setStartTime(show.getStartTime());
+
+        dto.setTheater(TheaterDto.toDto(theater));
+        dto.setCity(theater.getAddress().getCity());
+
+        dto.setMovie(MovieDto.toDto(movie));
+
+        List<SeatDto> seats = booking.getSeats().stream().map(s -> new SeatDto(s.getId(), s.getLabel()))
+                .collect(Collectors.toList());
+        dto.setSeats(seats);
+
+        dto.setCodeUrl(baseUrl + "/api/bookings/code/" + booking.getId());
+
+        return dto;
     }
 }
