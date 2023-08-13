@@ -43,7 +43,7 @@ public class ShowServiceImpl implements ShowService {
 
                 List<SeatDto> taken = seatsTaken.stream()
                         .filter(st -> Objects.equals(st.getShowId(), show.getId()))
-                        .map(st -> new SeatDto(st.getSeatId(), st.getRow() + "-" + st.getCol()))
+                        .map(st -> new SeatDto(st.getSeatId(), st.getLabel()))
                         .collect(Collectors.toList());
                 showDto.setSeatsTaken(taken);
 

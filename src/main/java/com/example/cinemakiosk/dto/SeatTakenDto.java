@@ -12,4 +12,8 @@ public class SeatTakenDto {
     private Long seatId;
     private String row;
     private String col;
+
+    public String getLabel() {
+        return row + "-" + col;
+    }
 }

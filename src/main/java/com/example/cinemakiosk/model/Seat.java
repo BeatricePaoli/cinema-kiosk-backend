@@ -19,4 +19,8 @@ public class Seat {
 
     @ManyToOne
     private Screen screen;
+
+    public String getLabel() {
+        return row + "-" + col;
+    }
 }

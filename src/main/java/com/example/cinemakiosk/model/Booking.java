@@ -30,7 +30,7 @@ public class Booking {
     @JoinColumn(name = "show_id")
     private Show show;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "seats_booking", joinColumns = { @JoinColumn(name = "booking_id") }, inverseJoinColumns = { @JoinColumn(name = "seat_id") })
     private Set<Seat> seats = new HashSet<>();
 

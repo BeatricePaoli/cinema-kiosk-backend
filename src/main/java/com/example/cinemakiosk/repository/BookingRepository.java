@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
@@ -16,4 +17,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "WHERE sh.id IN (:showIds) " +
             "AND b.status != 'CANCELED'")
     List<SeatTakenDto> getSeatsTaken(List<Long> showIds);
+
+    @Query("FROM Booking b JOIN FETCH b.seats " +
+            "JOIN FETCH b.show " +
+            "JOIN FETCH b.show.movie " +
+            "JOIN FETCH b.show.screen.theater " +
+            "JOIN FETCH b.show.screen.theater.address WHERE b.id = :id")
+    Optional<Booking> findByIdWithFetch(Long id);
 }
