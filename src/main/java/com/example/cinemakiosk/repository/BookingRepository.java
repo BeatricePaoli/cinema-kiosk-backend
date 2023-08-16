@@ -26,11 +26,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "JOIN FETCH b.show.screen.theater.address WHERE b.id = :id")
     Optional<Booking> findByIdWithFetch(Long id);
 
-    // TODO: WHERE b.user.id = :id
     @Query("FROM Booking b JOIN FETCH b.seats " +
             "JOIN FETCH b.show " +
             "JOIN FETCH b.show.movie " +
             "JOIN FETCH b.show.screen.theater " +
-            "JOIN FETCH b.show.screen.theater.address")
-    List<Booking> getBookings();
+            "JOIN FETCH b.show.screen.theater.address " +
+            "WHERE b.user.username = :username")
+    List<Booking> getBookings(String username);
 }

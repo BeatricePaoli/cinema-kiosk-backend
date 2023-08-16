@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class KeycloakRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
-    @Value("${auth.client-id}")
+    @Value("${auth.client-id.public}")
     private String clientId;
 
     @Override

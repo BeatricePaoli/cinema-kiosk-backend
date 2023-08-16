@@ -17,4 +17,6 @@ public class BookingDto {
     private String startTime;
     private Double price;
     private String codeUrl;
+
+    private String username;
 }

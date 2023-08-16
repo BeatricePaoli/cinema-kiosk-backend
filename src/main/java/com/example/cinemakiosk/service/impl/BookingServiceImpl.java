@@ -6,6 +6,7 @@ import com.example.cinemakiosk.repository.BookingRepository;
 import com.example.cinemakiosk.repository.SeatRepository;
 import com.example.cinemakiosk.repository.ShowRepository;
 import com.example.cinemakiosk.service.BookingService;
+import com.example.cinemakiosk.service.UserService;
 import com.example.cinemakiosk.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,9 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     private SeatRepository seatRepository;
 
-    // TODO: user
+    @Autowired
+    private UserService userService;
+
     @Override
     public Long createBooking(BookingDto dto) {
         Optional<Show> showOpt = showRepository.findById(dto.getShowId());
@@ -63,12 +66,23 @@ public class BookingServiceImpl implements BookingService {
                             .toList();
 
                     if (!toBookLabels.isEmpty() && toBookLabels.size() == toBookEntities.size()) {
+
+                        User user = null;
+                        if (dto.getUsername() != null) {
+                            user = userService.getOrCreateByUsername(dto.getUsername());
+                            if (user == null) {
+                                log.error("User {} not found", dto.getUsername());
+                                return null;
+                            }
+                        }
+
                         Booking booking = new Booking();
                         booking.setDateCreated(new Date());
                         booking.setStatus(BookingStatus.CREATED);
                         booking.setPrice(dto.getPrice());
                         booking.setShow(show);
                         booking.setSeats(new HashSet<>(toBookEntities));
+                        booking.setUser(user);
 
                         booking = bookingRepository.save(booking);
                         return booking.getId();
@@ -91,8 +105,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getBookings() {
-        List<Booking> bookings = bookingRepository.getBookings();
+    public List<BookingDto> getBookings(String username) {
+        List<Booking> bookings = bookingRepository.getBookings(username);
         return bookings.stream().map(this::toDto).collect(Collectors.toList());
     }
 

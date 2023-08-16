@@ -2,17 +2,21 @@ package com.example.cinemakiosk.controller;
 
 import com.example.cinemakiosk.dto.BookingDto;
 import com.example.cinemakiosk.service.BookingService;
+import lombok.extern.slf4j.Slf4j;
 import net.glxn.qrgen.javase.QRCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("api/bookings")
 public class BookingController {
@@ -21,7 +25,10 @@ public class BookingController {
     private BookingService bookingService;
 
     @PostMapping
-    public ResponseEntity<?> createBooking(@RequestBody BookingDto dto) {
+    public ResponseEntity<?> createBooking(@AuthenticationPrincipal Jwt jwt, @RequestBody BookingDto dto) {
+        String username = jwt.getClaimAsString("preferred_username");
+        dto.setUsername(username);
+
         Long bookingId = bookingService.createBooking(dto);
 
         if (bookingId == null) {
@@ -31,10 +38,10 @@ public class BookingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookingId);
     }
 
-    // TODO: user filter
     @GetMapping
-    public ResponseEntity<?> getBookings() {
-        List<BookingDto> result = bookingService.getBookings();
+    public ResponseEntity<?> getBookings(@AuthenticationPrincipal Jwt jwt) {
+        String username = jwt.getClaimAsString("preferred_username");
+        List<BookingDto> result = bookingService.getBookings(username);
         if (result.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
