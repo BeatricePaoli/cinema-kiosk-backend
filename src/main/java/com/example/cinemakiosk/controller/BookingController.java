@@ -42,9 +42,6 @@ public class BookingController {
     public ResponseEntity<?> getBookings(@AuthenticationPrincipal Jwt jwt) {
         String username = jwt.getClaimAsString("preferred_username");
         List<BookingDto> result = bookingService.getBookings(username);
-        if (result.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(result);
     }
 
@@ -53,6 +50,15 @@ public class BookingController {
         BookingDto result = bookingService.getById(id);
         if (result == null) {
             return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable("id") Long id) {
+        Boolean result = bookingService.deleteById(id);
+        if (result == null) {
+            return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(result);
     }

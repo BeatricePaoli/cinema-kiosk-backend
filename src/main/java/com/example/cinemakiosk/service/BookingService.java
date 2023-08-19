@@ -11,5 +11,7 @@ public interface BookingService {
 
     BookingDto getById(Long id);
 
+    Boolean deleteById(Long id);
+
     Boolean isBookingValid(Long id);
 }

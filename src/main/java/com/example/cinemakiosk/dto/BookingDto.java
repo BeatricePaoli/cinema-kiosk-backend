@@ -1,5 +1,6 @@
 package com.example.cinemakiosk.dto;
 
+import com.example.cinemakiosk.model.BookingStatus;
 import lombok.Data;
 
 import java.util.Date;
@@ -17,6 +18,7 @@ public class BookingDto {
     private String startTime;
     private Double price;
     private String codeUrl;
+    private BookingStatus status;
 
     private String username;
 }

@@ -117,8 +117,34 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public Boolean deleteById(Long id) {
+        Optional<Booking> bookingOpt = bookingRepository.findByIdWithFetch(id);
+        if (bookingOpt.isPresent()) {
+            Booking booking = bookingOpt.get();
+            Show show = booking.getShow();
+            String[] splittedTime = show.getStartTime().split(":");
+            LocalDate showDate = DateUtils.convertToLocalDate(show.getDate());
+            LocalTime showTime = LocalTime.of(Integer.parseInt(splittedTime[0]), Integer.parseInt(splittedTime[1]));
+            LocalDateTime showDateTime = LocalDateTime.of(showDate, showTime);
+            LocalDateTime now = LocalDateTime.now();
+
+            if (!now.isAfter(showDateTime) && booking.getStatus() != BookingStatus.CHECKEDIN) {
+                booking.setStatus(BookingStatus.CANCELED);
+                bookingRepository.save(booking);
+                return true;
+            } else {
+                log.error("Booking id {} with status {}, time {} can't be deleted", id, booking.getStatus(), showDateTime);
+            }
+        } else {
+            log.error("Booking id {} to book not found", id);
+        }
+        return false;
+    }
+
+    @Override
     public Boolean isBookingValid(Long id) {
-        return bookingRepository.findById(id).isPresent();
+        Optional<Booking> bookOpt = bookingRepository.findById(id);
+        return bookOpt.isPresent() && bookOpt.get().getStatus() != BookingStatus.CANCELED;
     }
 
     private BookingDto toDto(Booking booking) {
@@ -129,6 +155,7 @@ public class BookingServiceImpl implements BookingService {
         BookingDto dto = new BookingDto();
         dto.setId(booking.getId());
         dto.setPrice(booking.getPrice());
+        dto.setStatus(booking.getStatus());
         dto.setShowId(show.getId());
         dto.setDate(show.getDate());
         dto.setStartTime(show.getStartTime());

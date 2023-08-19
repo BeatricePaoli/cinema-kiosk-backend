@@ -1,6 +1,5 @@
 package com.example.cinemakiosk.repository;
 
-import com.example.cinemakiosk.dto.BookingDto;
 import com.example.cinemakiosk.dto.SeatTakenDto;
 import com.example.cinemakiosk.model.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,7 +22,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "JOIN FETCH b.show " +
             "JOIN FETCH b.show.movie " +
             "JOIN FETCH b.show.screen.theater " +
-            "JOIN FETCH b.show.screen.theater.address WHERE b.id = :id")
+            "JOIN FETCH b.show.screen.theater.address WHERE b.id = :id " +
+            "AND b.status != 'CANCELED'")
     Optional<Booking> findByIdWithFetch(Long id);
 
     @Query("FROM Booking b JOIN FETCH b.seats " +
@@ -31,6 +31,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "JOIN FETCH b.show.movie " +
             "JOIN FETCH b.show.screen.theater " +
             "JOIN FETCH b.show.screen.theater.address " +
-            "WHERE b.user.username = :username")
+            "WHERE b.user.username = :username " +
+            "AND b.status != 'CANCELED'")
     List<Booking> getBookings(String username);
 }
