@@ -53,6 +53,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
                     predicates.add(builder.like(builder.lower(root.get(Movie_.name)), "%" + dto.getMovie().toLowerCase() + "%"));
                 }
 
+                query.orderBy(builder.asc(root.get(Movie_.releaseDate)));
+
                 return builder.and(predicates.toArray(new Predicate[0]));
             }
         };
