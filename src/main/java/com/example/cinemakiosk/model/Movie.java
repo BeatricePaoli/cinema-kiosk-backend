@@ -35,12 +35,11 @@ public class Movie {
     @Temporal(TemporalType.DATE)
     private Date releaseDate;
 
-    // TODO: non elegantissimo, possibili attori doppioni (vedi genres)
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "actors_movies", joinColumns = { @JoinColumn(name = "movie_id") }, inverseJoinColumns = { @JoinColumn(name = "actor_id") })
     private Set<Actor> actors = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)//, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "genres_movies", joinColumns = { @JoinColumn(name = "movie_id") }, inverseJoinColumns = { @JoinColumn(name = "genre_id") })
     private Set<MovieGenre> genres = new HashSet<>();
 }

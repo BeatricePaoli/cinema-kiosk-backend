@@ -26,6 +26,9 @@ public class DBinit {
     private MovieGenreRepository movieGenreRepository;
 
     @Autowired
+    private ActorRepository actorRepository;
+
+    @Autowired
     private TheaterRepository theaterRepository;
 
     @Autowired
@@ -43,6 +46,7 @@ public class DBinit {
 //        bookingRepository.deleteAll();
 //        showRepository.deleteAll();
 //        movieRepository.deleteAll();
+//        actorRepository.deleteAll();
 //        movieGenreRepository.deleteAll();
 //        theaterRepository.deleteAll();
 
@@ -222,6 +226,7 @@ public class DBinit {
         a.setSurname(surname);
         File file = ResourceUtils.getFile(path);
         a.setImg(Files.readAllBytes(file.toPath()));
+        a = actorRepository.save(a);
         return a;
     }
 }
