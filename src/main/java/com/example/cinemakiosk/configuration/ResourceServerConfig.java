@@ -33,13 +33,14 @@ public class ResourceServerConfig {
                 .cors(cors -> cors.configurationSource(getCorsConfig()))
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("api/movies")
+                        .ignoringRequestMatchers("api/movies", "api/context-broker/**")
                 )
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("api/movies", "api/movies/**").permitAll()
                         .requestMatchers("api/shows", "api/shows/**").permitAll()
                         .requestMatchers("api/theaters", "api/theaters/**").permitAll()
                         .requestMatchers("api/bookings", "api/bookings/**").authenticated()
+                        .requestMatchers("api/context-broker/**").permitAll()
                         .anyRequest().permitAll())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .httpBasic(withDefaults());

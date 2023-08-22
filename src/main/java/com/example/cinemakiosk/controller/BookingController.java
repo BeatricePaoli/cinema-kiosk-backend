@@ -2,7 +2,6 @@ package com.example.cinemakiosk.controller;
 
 import com.example.cinemakiosk.dto.BookingDto;
 import com.example.cinemakiosk.service.BookingService;
-import lombok.extern.slf4j.Slf4j;
 import net.glxn.qrgen.javase.QRCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("api/bookings")
 public class BookingController {
