@@ -121,6 +121,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public BookingCompactDto getByIdCompact(Long id) {
+        Optional<Booking> bookingOpt = bookingRepository.findByIdWithFetch(id);
+        return bookingOpt.map(this::toCompactDto).orElse(null);
+    }
+
+    @Override
     public Boolean deleteById(Long id) {
         Optional<Booking> bookingOpt = bookingRepository.findByIdWithFetch(id);
         if (bookingOpt.isPresent()) {
@@ -143,12 +149,6 @@ public class BookingServiceImpl implements BookingService {
             log.error("Booking id {} to book not found", id);
         }
         return false;
-    }
-
-    @Override
-    public Boolean isBookingValid(Long id) {
-        Optional<Booking> bookOpt = bookingRepository.findById(id);
-        return bookOpt.isPresent() && bookOpt.get().getStatus() != BookingStatus.CANCELED;
     }
 
     private BookingDto toDto(Booking booking) {
@@ -174,6 +174,29 @@ public class BookingServiceImpl implements BookingService {
         dto.setSeats(seats);
 
         dto.setCodeUrl(baseUrl + "/api/bookings/code/" + booking.getId());
+
+        return dto;
+    }
+
+    private BookingCompactDto toCompactDto(Booking booking) {
+        Show show = booking.getShow();
+        Movie movie = show.getMovie();
+        Theater theater = show.getScreen().getTheater();
+
+        BookingCompactDto dto = new BookingCompactDto();
+        dto.setId(booking.getId());
+        dto.setPrice(booking.getPrice());
+        dto.setStatus(booking.getStatus());
+
+        dto.setDate(show.getDate());
+        dto.setStartTime(show.getStartTime());
+
+        dto.setTheaterName(theater.getName());
+        dto.setCity(theater.getAddress().getCity());
+
+        dto.setMovieName(movie.getName());
+
+        dto.setTotalSeats(booking.getSeats().size());
 
         return dto;
     }

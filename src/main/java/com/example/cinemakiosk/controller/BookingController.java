@@ -1,7 +1,10 @@
 package com.example.cinemakiosk.controller;
 
+import com.example.cinemakiosk.dto.BookingCompactDto;
 import com.example.cinemakiosk.dto.BookingDto;
 import com.example.cinemakiosk.service.BookingService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.glxn.qrgen.javase.QRCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -62,14 +65,18 @@ public class BookingController {
     }
 
     @GetMapping(value = "/code/{id}", produces = MediaType.IMAGE_JPEG_VALUE)
-    public @ResponseBody ResponseEntity<?> getQrCode(@PathVariable("id") Long id) {
-        Boolean isValid = bookingService.isBookingValid(id);
-        if (!isValid) {
+    public @ResponseBody ResponseEntity<?> getQrCode(@PathVariable("id") Long id) throws JsonProcessingException {
+        BookingCompactDto booking = bookingService.getByIdCompact(id);
+        if (booking == null) {
             return ResponseEntity.notFound().build();
         }
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(booking);
+
+
         ByteArrayOutputStream stream = QRCode
-                .from(String.valueOf(id))
-                .withSize(250, 250)
+                .from(json)
+                .withSize(400, 400)
                 .stream();
 
         return ResponseEntity.ok(new ByteArrayResource(stream.toByteArray()));
