@@ -6,6 +6,7 @@ import com.example.cinemakiosk.repository.BookingRepository;
 import com.example.cinemakiosk.repository.SeatRepository;
 import com.example.cinemakiosk.repository.ShowRepository;
 import com.example.cinemakiosk.service.BookingService;
+import com.example.cinemakiosk.service.MovieService;
 import com.example.cinemakiosk.service.UserService;
 import com.example.cinemakiosk.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private MovieService movieService;
 
     @Override
     public Long createBooking(BookingDto dto) {
@@ -163,7 +167,7 @@ public class BookingServiceImpl implements BookingService {
         dto.setTheater(TheaterDto.toDto(theater));
         dto.setCity(theater.getAddress().getCity());
 
-        dto.setMovie(MovieDto.toDto(movie));
+        dto.setMovie(movieService.toDto(movie));
 
         List<SeatDto> seats = booking.getSeats().stream().map(s -> new SeatDto(s.getId(), s.getLabel()))
                 .collect(Collectors.toList());

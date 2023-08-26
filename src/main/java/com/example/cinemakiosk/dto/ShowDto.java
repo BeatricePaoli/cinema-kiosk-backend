@@ -18,12 +18,4 @@ public class ShowDto {
     private MovieDto movie;
     private ScreenDto screen;
     private List<SeatDto> seatsTaken;
-
-    public static ShowDto toDto(Show show) {
-        ShowDto dto = new ShowDto();
-        BeanUtils.copyProperties(show, dto);
-        dto.setMovie(MovieDto.toDto(show.getMovie()));
-        dto.setScreen(ScreenDto.toDto(show.getScreen()));
-        return dto;
-    }
 }

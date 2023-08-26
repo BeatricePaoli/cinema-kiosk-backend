@@ -22,6 +22,9 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
     @Query("FROM Movie m LEFT JOIN FETCH m.actors LEFT JOIN FETCH m.genres WHERE m.id = :id")
     Optional<Movie> findByIdWithFetch(Long id);
 
+    @Query("SELECT m.img FROM Movie m WHERE m.id = :id")
+    byte[] findImgByMovieId(Long id);
+
     static Specification<Movie> search(MovieFilterDto dto, boolean searchCurrent) {
         return new Specification<>() {
             public Predicate toPredicate(Root<Movie> root, CriteriaQuery<?> query, CriteriaBuilder builder) {

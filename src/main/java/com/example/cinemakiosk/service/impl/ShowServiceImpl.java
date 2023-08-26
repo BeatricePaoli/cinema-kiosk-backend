@@ -1,13 +1,12 @@
 package com.example.cinemakiosk.service.impl;
 
-import com.example.cinemakiosk.dto.SeatDto;
-import com.example.cinemakiosk.dto.SeatTakenDto;
-import com.example.cinemakiosk.dto.ShowDto;
-import com.example.cinemakiosk.dto.ShowFilterDto;
+import com.example.cinemakiosk.dto.*;
 import com.example.cinemakiosk.model.Show;
 import com.example.cinemakiosk.repository.BookingRepository;
 import com.example.cinemakiosk.repository.ShowRepository;
+import com.example.cinemakiosk.service.MovieService;
 import com.example.cinemakiosk.service.ShowService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +24,9 @@ public class ShowServiceImpl implements ShowService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private MovieService movieService;
+
     @Override
     public List<ShowDto> search(ShowFilterDto dto) {
         List<Show> shows = showRepository.search(dto.getMovieId(), dto.getCity(), dto.getTheaterId());
@@ -39,7 +41,7 @@ public class ShowServiceImpl implements ShowService {
             }
 
             return shows.stream().map(show -> {
-                ShowDto showDto = ShowDto.toDto(show);
+                ShowDto showDto = this.toDto(show);
 
                 List<SeatDto> taken = seatsTaken.stream()
                         .filter(st -> Objects.equals(st.getShowId(), show.getId()))
@@ -52,5 +54,14 @@ public class ShowServiceImpl implements ShowService {
         }
 
         return new ArrayList<>();
+    }
+
+    @Override
+    public ShowDto toDto(Show show) {
+        ShowDto dto = new ShowDto();
+        BeanUtils.copyProperties(show, dto);
+        dto.setMovie(movieService.toDto(show.getMovie()));
+        dto.setScreen(ScreenDto.toDto(show.getScreen()));
+        return dto;
     }
 }
