@@ -15,5 +15,5 @@ public interface BookingService {
 
     Boolean deleteById(Long id);
 
-    Boolean validateById(Long id);
+    Boolean validateById(Long id, String username);
 }

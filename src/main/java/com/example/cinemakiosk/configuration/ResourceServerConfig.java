@@ -1,5 +1,7 @@
 package com.example.cinemakiosk.configuration;
 
+import com.example.cinemakiosk.model.Role;
+import jakarta.ws.rs.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -39,6 +41,7 @@ public class ResourceServerConfig {
                         .requestMatchers("api/movies", "api/movies/**").permitAll()
                         .requestMatchers("api/shows", "api/shows/**").permitAll()
                         .requestMatchers("api/theaters", "api/theaters/**").permitAll()
+                        .requestMatchers(HttpMethod.PATCH,"api/bookings/**").hasRole(Role.CASHIER.toString())
                         .requestMatchers("api/bookings", "api/bookings/**").authenticated()
                         .requestMatchers("api/context-broker/**").permitAll()
                         .anyRequest().permitAll())

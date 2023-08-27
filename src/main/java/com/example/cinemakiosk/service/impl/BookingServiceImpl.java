@@ -5,6 +5,7 @@ import com.example.cinemakiosk.model.*;
 import com.example.cinemakiosk.repository.BookingRepository;
 import com.example.cinemakiosk.repository.SeatRepository;
 import com.example.cinemakiosk.repository.ShowRepository;
+import com.example.cinemakiosk.repository.UserRepository;
 import com.example.cinemakiosk.service.BookingService;
 import com.example.cinemakiosk.service.MovieService;
 import com.example.cinemakiosk.service.UserService;
@@ -38,6 +39,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private SeatRepository seatRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private UserService userService;
@@ -152,23 +156,33 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Boolean validateById(Long id) {
+    public Boolean validateById(Long id, String username) {
         Optional<Booking> bookingOpt = bookingRepository.findByIdWithFetch(id);
-        if (bookingOpt.isPresent()) {
+        Optional<User> cashierOpt = userRepository.findFirstByUsername(username);
+        if (bookingOpt.isPresent() && cashierOpt.isPresent()) {
             Booking booking = bookingOpt.get();
+            User cashier = cashierOpt.get();
 
-            // TODO: gestione created vs paid
-            if (booking.getStatus() == BookingStatus.CREATED || booking.getStatus() == BookingStatus.PAID) {
-                booking.setStatus(BookingStatus.CHECKEDIN);
-                bookingRepository.save(booking);
+            if (cashier.getTheaterCashier() != null && Objects.equals(cashier.getTheaterCashier().getId(), booking.getShow().getScreen().getTheater().getId())) {
+                // TODO: gestione created vs paid
+                if (booking.getStatus() == BookingStatus.CREATED || booking.getStatus() == BookingStatus.PAID) {
+                    booking.setStatus(BookingStatus.CHECKEDIN);
+                    bookingRepository.save(booking);
 
-                // TODO: attivazione smartband
-                return true;
+                    // TODO: attivazione smartband
+                    return true;
+                } else {
+                    log.error("Booking id {} with status {} can't be validated", id, booking.getStatus());
+                }
             } else {
-                log.error("Booking id {} with status {} can't be validated", id, booking.getStatus());
+                log.error("Booking id {} can't be validated by user {}", id, username);
             }
         } else {
-            log.error("Booking id {} to validate not found", id);
+            if (cashierOpt.isPresent()) {
+                log.error("Booking id {} to validate not found", id);
+            } else {
+                log.error("User {} not found", username);
+            }
         }
         return false;
     }

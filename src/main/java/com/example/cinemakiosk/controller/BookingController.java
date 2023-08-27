@@ -3,6 +3,7 @@ package com.example.cinemakiosk.controller;
 import com.example.cinemakiosk.dto.BookingCompactDto;
 import com.example.cinemakiosk.dto.BookingDto;
 import com.example.cinemakiosk.service.BookingService;
+import com.example.cinemakiosk.utils.JwtClaimConstants;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.glxn.qrgen.javase.QRCode;
@@ -58,16 +59,17 @@ public class BookingController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteById(@PathVariable("id") Long id) {
         Boolean result = bookingService.deleteById(id);
-        if (result == null) {
+        if (!result) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> validateById(@PathVariable("id") Long id) {
-        Boolean result = bookingService.validateById(id);
-        if (result == null) {
+    public ResponseEntity<?> validateById(@AuthenticationPrincipal Jwt jwt, @PathVariable("id") Long id) {
+        String username = jwt.getClaimAsString(JwtClaimConstants.username);
+        Boolean result = bookingService.validateById(id,username);
+        if (!result) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.noContent().build();
