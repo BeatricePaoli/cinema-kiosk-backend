@@ -61,7 +61,16 @@ public class BookingController {
         if (result == null) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(result);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> validateById(@PathVariable("id") Long id) {
+        Boolean result = bookingService.validateById(id);
+        if (result == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "/code/{id}", produces = MediaType.IMAGE_JPEG_VALUE)

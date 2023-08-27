@@ -146,7 +146,29 @@ public class BookingServiceImpl implements BookingService {
                 log.error("Booking id {} with status {}, time {} can't be deleted", id, booking.getStatus(), showDateTime);
             }
         } else {
-            log.error("Booking id {} to book not found", id);
+            log.error("Booking id {} to delete not found", id);
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean validateById(Long id) {
+        Optional<Booking> bookingOpt = bookingRepository.findByIdWithFetch(id);
+        if (bookingOpt.isPresent()) {
+            Booking booking = bookingOpt.get();
+
+            // TODO: gestione created vs paid
+            if (booking.getStatus() == BookingStatus.CREATED || booking.getStatus() == BookingStatus.PAID) {
+                booking.setStatus(BookingStatus.CHECKEDIN);
+                bookingRepository.save(booking);
+
+                // TODO: attivazione smartband
+                return true;
+            } else {
+                log.error("Booking id {} with status {} can't be validated", id, booking.getStatus());
+            }
+        } else {
+            log.error("Booking id {} to validate not found", id);
         }
         return false;
     }

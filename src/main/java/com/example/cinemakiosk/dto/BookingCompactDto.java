@@ -16,5 +16,4 @@ public class BookingCompactDto {
     private String startTime;
     private Double price;
     private BookingStatus status;
-    private String username;
 }

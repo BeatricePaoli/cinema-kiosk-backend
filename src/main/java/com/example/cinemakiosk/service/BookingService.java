@@ -14,4 +14,6 @@ public interface BookingService {
     BookingCompactDto getByIdCompact(Long id);
 
     Boolean deleteById(Long id);
+
+    Boolean validateById(Long id);
 }
