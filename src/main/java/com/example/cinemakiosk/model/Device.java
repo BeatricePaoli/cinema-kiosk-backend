@@ -7,17 +7,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "bar_product")
-public class BarProduct {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name="type", discriminatorType = DiscriminatorType.STRING)
+@Table(name = "device")
+public class Device {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String name;
-    private Double price;
-    private String currency;
-    private String productCode;
+    private String contextBrokerId;
 
     @ManyToOne
     private Theater theater;

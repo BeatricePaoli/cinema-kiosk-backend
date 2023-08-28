@@ -10,7 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.*;
@@ -279,6 +280,42 @@ public class DBinit {
             t2.setDays(Arrays.asList(Day.values()));
             t2.setTheater(t);
             t.setTicketTypes(Arrays.asList(t1, t2));
+
+            Bar bar = new Bar();
+            bar.setName("Bar");
+            bar.setEmitterSerial("A5GHU8");
+            bar.setTheater(t);
+            t.setBar(bar);
+
+            BarProduct p1 = new BarProduct();
+            p1.setPrice(5d);
+            p1.setCurrency("EUR");
+            p1.setName("Coca Cola");
+            p1.setProductCode("P12345");
+            p1.setTheater(t);
+
+            BarProduct p2 = new BarProduct();
+            p2.setPrice(5d);
+            p2.setCurrency("EUR");
+            p2.setName("Popcorn");
+            p2.setProductCode("P6789");
+            p2.setTheater(t);
+
+            t.setBarProducts(Arrays.asList(p1, p2));
+
+            SmartBand sm1 = new SmartBand();
+            sm1.setContextBrokerId("urn:ngsi-ld:SmartBand:smartBand1");
+            sm1.setTheater(t);
+
+            SmartBand sm2 = new SmartBand();
+            sm2.setContextBrokerId("urn:ngsi-ld:SmartBand:smartBand2");
+            sm2.setTheater(t);
+
+            CashRegister cr1 = new CashRegister();
+            cr1.setContextBrokerId("urn:ngsi-ld:CashRegister:cashRegister1");
+            cr1.setTheater(t);
+
+            t.setDevices(Arrays.asList(sm1, sm2, cr1));
 
             theaterRepository.save(t);
 

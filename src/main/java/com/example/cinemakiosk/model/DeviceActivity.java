@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,7 +17,9 @@ public class DeviceActivity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private String deviceId;
+    @ManyToOne
+    private SmartBand smartband;
+
     private Boolean hasEnteredBar;
     private Boolean hasEnteredWrongRoom;
     private Boolean hasLeftTheater;
@@ -34,7 +37,6 @@ public class DeviceActivity {
     @JoinColumn(name = "booking_id")
     private Booking booking;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "bar_order_id", referencedColumnName = "id")
-    private BarOrder barOrder;
+    @OneToMany(mappedBy = "deviceActivity", cascade = CascadeType.ALL)
+    private List<BarOrder> barOrders;
 }

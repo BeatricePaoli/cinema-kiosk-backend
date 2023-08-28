@@ -20,9 +20,11 @@ public class BarOrder {
     @Temporal(TemporalType.TIMESTAMP)
     private Date purchaseTms;
 
-    @OneToOne(mappedBy = "barOrder")
+    private Integer quantity;
+
+    @ManyToOne
     private DeviceActivity deviceActivity;
 
-    @OneToMany(mappedBy = "barOrder", cascade = CascadeType.ALL)
-    private List<BarOrderProduct> barOrderProducts;
+    @ManyToOne
+    private BarProduct product;
 }

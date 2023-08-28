@@ -14,7 +14,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Entity
-@Table(name = "screen")
+@DiscriminatorValue("screen")
 public class Screen extends Room {
 
     @Formula("(SELECT COUNT(*) FROM Seat s WHERE s.screen_id = id)")
