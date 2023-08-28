@@ -19,7 +19,7 @@ public class DeviceActivity {
     private String deviceId;
     private Boolean hasEnteredBar;
     private Boolean hasEnteredWrongRoom;
-    private Boolean hasLegtTheater;
+    private Boolean hasLeftTheater;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date activationTms;

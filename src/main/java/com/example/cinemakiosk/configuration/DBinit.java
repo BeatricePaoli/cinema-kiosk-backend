@@ -40,6 +40,9 @@ public class DBinit {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
 //    @PostConstruct
     public void init() throws IOException {
 
@@ -49,6 +52,7 @@ public class DBinit {
         actorRepository.deleteAll();
         movieGenreRepository.deleteAll();
         theaterRepository.deleteAll();
+        userRepository.deleteAll();
 
         List<MovieGenre> genres = movieGenreRepository.findAll();
         if (genres.isEmpty()) {
@@ -335,6 +339,24 @@ public class DBinit {
             show5.setScreen(screen);
 
             showRepository.save(show5);
+        }
+
+        List<User> users = userRepository.findAll();
+        if (users.isEmpty()) {
+
+            User u1 = new User();
+            u1.setUsername("beatrice");
+            users.add(u1);
+
+            Theater t = theaterRepository.findByName("Cinema Test").get(0);
+            User u2 = new User();
+            u2.setUsername("cassiere");
+            u2.setTheaterCashier(t);
+            t.setCashiers(Collections.singletonList(u2));
+            users.add(u2);
+
+            userRepository.saveAll(users);
+            theaterRepository.save(t);
         }
     }
 

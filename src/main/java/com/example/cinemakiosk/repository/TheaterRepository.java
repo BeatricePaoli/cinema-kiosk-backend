@@ -10,6 +10,8 @@ import java.util.List;
 @Repository
 public interface TheaterRepository extends JpaRepository<Theater, Long> {
 
+    List<Theater> findByName(String name);
+
     @Query("SELECT t FROM Theater t JOIN FETCH t.address")
     List<Theater> findAllWithFetch();
 
