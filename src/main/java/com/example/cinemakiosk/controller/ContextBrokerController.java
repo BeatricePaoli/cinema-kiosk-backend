@@ -2,8 +2,10 @@ package com.example.cinemakiosk.controller;
 
 import com.example.cinemakiosk.dto.contextbroker.CashRegisterDto;
 import com.example.cinemakiosk.dto.contextbroker.NotificationDto;
-import com.example.cinemakiosk.dto.contextbroker.SmartbandDto;
+import com.example.cinemakiosk.dto.contextbroker.SmartBandDto;
+import com.example.cinemakiosk.service.DeviceActivityService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,22 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/context-broker")
 public class ContextBrokerController {
 
-    @PostMapping(value = "smartband")
-    public ResponseEntity<?> getNotificationSmartBand(@RequestBody NotificationDto<SmartbandDto> dto) {
+    @Autowired
+    private DeviceActivityService deviceActivityService;
+
+    @PostMapping(value = "smartBand")
+    public ResponseEntity<?> getNotificationSmartBand(@RequestBody NotificationDto<SmartBandDto> dto) {
         log.info("Data notifica: {}, seriale {}", dto.getNotifiedAt(), dto.getData().get(0).getEmitterSerial().getValue());
+        log.info("ON: {}", dto.getData().get(0).toString());
+        deviceActivityService.update(dto);
         return ResponseEntity.noContent().build();
     }
 
-    // Scorpio non invia l'header Content-Type e quindi Spring Boot lo interpreta come octet-stream invece di json
-    // e non riesce a deserializzare il body in automatico --> RISOLTO AGGIUNGENDO L'HEADER IN receiverInfo NELLA SUBSCRIBE
-//    @PostMapping(value = "smartband", consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-//    public ResponseEntity<?> getNotificationSmartBand(HttpServletRequest request, @RequestBody String body) throws JsonProcessingException {
-//        log.info("Header {}", request.getHeader("Content-Type"));
+//    @PostMapping(value = "smartBand")
+//    public ResponseEntity<?> getNotificationSmartBand(HttpServletRequest request, @RequestBody String body) {
 //        log.info(body);
-//        ObjectMapper mapper = new ObjectMapper();
-//        JavaType javaType = mapper.getTypeFactory().constructParametricType(NotificationDto.class, SmartbandDto.class);
-//        NotificationDto<SmartbandDto> dto = mapper.readValue(body, javaType);
-//        log.info("Data notifica: {}, seriale {}", dto.getNotifiedAt(), dto.getData().get(0).getEmitterSerial());
 //        return ResponseEntity.noContent().build();
 //    }
 

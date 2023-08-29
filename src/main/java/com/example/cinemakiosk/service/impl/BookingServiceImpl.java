@@ -1,14 +1,10 @@
 package com.example.cinemakiosk.service.impl;
 
 import com.example.cinemakiosk.dto.*;
+import com.example.cinemakiosk.dto.contextbroker.SmartBandCompactDto;
 import com.example.cinemakiosk.model.*;
-import com.example.cinemakiosk.repository.BookingRepository;
-import com.example.cinemakiosk.repository.SeatRepository;
-import com.example.cinemakiosk.repository.ShowRepository;
-import com.example.cinemakiosk.repository.UserRepository;
-import com.example.cinemakiosk.service.BookingService;
-import com.example.cinemakiosk.service.MovieService;
-import com.example.cinemakiosk.service.UserService;
+import com.example.cinemakiosk.repository.*;
+import com.example.cinemakiosk.service.*;
 import com.example.cinemakiosk.utils.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +40,19 @@ public class BookingServiceImpl implements BookingService {
     private UserRepository userRepository;
 
     @Autowired
+    private SmartBandRepository smartBandRepository;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
     private MovieService movieService;
+
+    @Autowired
+    private ContextBrokerService contextBrokerService;
+
+    @Autowired
+    private DeviceActivityService deviceActivityService;
 
     @Override
     public Long createBooking(BookingDto dto) {
@@ -166,11 +171,34 @@ public class BookingServiceImpl implements BookingService {
             if (cashier.getTheaterCashier() != null && Objects.equals(cashier.getTheaterCashier().getId(), booking.getShow().getScreen().getTheater().getId())) {
                 // TODO: gestione created vs paid
                 if (booking.getStatus() == BookingStatus.CREATED || booking.getStatus() == BookingStatus.PAID) {
-                    booking.setStatus(BookingStatus.CHECKEDIN);
-                    bookingRepository.save(booking);
 
-                    // TODO: attivazione smartband
-                    return true;
+                    List<SmartBandCompactDto> smartbands = contextBrokerService.searchSmartBands();
+                    List<SmartBand> theaterSmartbands = smartBandRepository.findByTheaterId(
+                            booking.getShow().getScreen().getTheater().getId()
+                    );
+
+                    List<SmartBand> availableSmartbands = theaterSmartbands.stream().filter(s -> {
+                        Optional<SmartBandCompactDto> found = smartbands.stream()
+                                .filter(sb -> Objects.equals(sb.getId(), s.getContextBrokerId())).findFirst();
+                        return found.isPresent() && (found.get().getOnInfo() == null || !Objects.equals(found.get().getOnInfo().getValue(), "true"));
+                    }).toList();
+
+                    if (availableSmartbands.size() >= booking.getSeats().size()) {
+                        List<SmartBand> toActivate = availableSmartbands.stream().limit(booking.getSeats().size()).toList();
+                        toActivate.stream()
+                                .takeWhile(s -> contextBrokerService.sendCommand(s.getContextBrokerId(), "on", "true"))
+                                .forEach(s -> {
+                                    deviceActivityService.create(s, booking);
+                        });
+
+                        booking.setStatus(BookingStatus.CHECKEDIN);
+                        bookingRepository.save(booking);
+
+                        return true;
+                    } else {
+                        log.error("Not enough smartbands available: found {}, needed {}",
+                                availableSmartbands.size(), booking.getSeats().size());
+                    }
                 } else {
                     log.error("Booking id {} with status {} can't be validated", id, booking.getStatus());
                 }
