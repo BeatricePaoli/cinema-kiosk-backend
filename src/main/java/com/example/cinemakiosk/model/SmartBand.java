@@ -14,6 +14,6 @@ public class SmartBand extends Device {
 
     private Boolean deleted;
 
-    @OneToMany(mappedBy = "smartband", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "smartBand", cascade = CascadeType.ALL)
     private List<DeviceActivity> activities;
 }

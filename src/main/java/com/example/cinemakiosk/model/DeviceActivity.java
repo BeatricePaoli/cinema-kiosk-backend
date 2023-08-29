@@ -18,7 +18,7 @@ public class DeviceActivity {
     private Long id;
 
     @ManyToOne
-    private SmartBand smartband;
+    private SmartBand smartBand;
 
     private Boolean hasEnteredBar;
     private Boolean hasEnteredWrongRoom;
