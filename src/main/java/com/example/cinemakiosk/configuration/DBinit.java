@@ -52,8 +52,8 @@ public class DBinit {
         movieRepository.deleteAll();
         actorRepository.deleteAll();
         movieGenreRepository.deleteAll();
-        theaterRepository.deleteAll();
         userRepository.deleteAll();
+        theaterRepository.deleteAll();
 
         List<MovieGenre> genres = movieGenreRepository.findAll();
         if (genres.isEmpty()) {
@@ -391,6 +391,12 @@ public class DBinit {
             u2.setTheaterCashier(t);
             t.setCashiers(Collections.singletonList(u2));
             users.add(u2);
+
+            User u3 = new User();
+            u3.setUsername("theater-admin");
+            u3.setTheaters(Collections.singletonList(t));
+            t.setAdmin(u3);
+            users.add(u3);
 
             userRepository.saveAll(users);
             theaterRepository.save(t);
