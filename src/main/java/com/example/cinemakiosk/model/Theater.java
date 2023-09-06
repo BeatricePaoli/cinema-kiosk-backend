@@ -17,6 +17,7 @@ public class Theater {
     private Long id;
 
     private String name;
+    private Boolean deleted;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", referencedColumnName = "id")
@@ -38,7 +39,7 @@ public class Theater {
     @ManyToOne
     private User admin;
 
-    @OneToMany(mappedBy = "theaterCashier")
+    @OneToMany(mappedBy = "theaterCashier", cascade = CascadeType.ALL)
     private List<User> cashiers;
 
     @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL)

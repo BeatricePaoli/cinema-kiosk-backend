@@ -28,7 +28,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<?> createBooking(@AuthenticationPrincipal Jwt jwt, @RequestBody BookingDto dto) {
-        String username = jwt.getClaimAsString("preferred_username");
+        String username = jwt.getClaimAsString(JwtClaimConstants.username);
         dto.setUsername(username);
 
         Long bookingId = bookingService.createBooking(dto);
@@ -42,7 +42,7 @@ public class BookingController {
 
     @GetMapping
     public ResponseEntity<?> getBookings(@AuthenticationPrincipal Jwt jwt) {
-        String username = jwt.getClaimAsString("preferred_username");
+        String username = jwt.getClaimAsString(JwtClaimConstants.username);
         List<BookingDto> result = bookingService.getBookings(username);
         return ResponseEntity.ok(result);
     }

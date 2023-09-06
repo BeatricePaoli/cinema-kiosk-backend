@@ -1,9 +1,6 @@
 package com.example.cinemakiosk.service.impl;
 
-import com.example.cinemakiosk.dto.AutocompleteTheaterFilterDto;
-import com.example.cinemakiosk.dto.CityFilterDto;
-import com.example.cinemakiosk.dto.TheaterFilterDto;
-import com.example.cinemakiosk.dto.TicketTypeDto;
+import com.example.cinemakiosk.dto.*;
 import com.example.cinemakiosk.model.Theater;
 import com.example.cinemakiosk.model.TicketType;
 import com.example.cinemakiosk.repository.TheaterRepository;
@@ -14,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +22,12 @@ public class TheaterServiceImpl implements TheaterService {
 
     @Autowired
     private TicketTypeRepository ticketTypeRepository;
+
+    @Override
+    public List<TheaterDto> getTheaters(String username) {
+        List<Theater> theaters = theaterRepository.findByAdmin(username);
+        return theaters.stream().map(TheaterDto::toDto).collect(Collectors.toList());
+    }
 
     @Override
     public AutocompleteTheaterFilterDto getFilters(Long movieId) {
@@ -49,5 +53,22 @@ public class TheaterServiceImpl implements TheaterService {
     public List<TicketTypeDto> getTicketTypes(Long id) {
         List<TicketType> ticketTypes = ticketTypeRepository.getByTheater(id);
         return ticketTypes.stream().map(TicketTypeDto::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public Boolean deleteById(Long id) {
+        Optional<Theater> theaterOpt = theaterRepository.findById(id);
+        if (theaterOpt.isPresent()) {
+            Theater theater = theaterOpt.get();
+            theater.setDeleted(true);
+            theaterRepository.save(theater);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean checkIsAdminOfTheater(String username, Long id) {
+        return theaterRepository.theaterBelongsToAdmin(username, id);
     }
 }

@@ -39,10 +39,16 @@ public class ResourceServerConfig {
                 )
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("api/movies", "api/movies/**").permitAll()
+
                         .requestMatchers("api/shows", "api/shows/**").permitAll()
-                        .requestMatchers("api/theaters", "api/theaters/**").permitAll()
+
+                        .requestMatchers("api/theaters").hasRole(Role.ADMIN.toString())
+                        .requestMatchers(HttpMethod.DELETE, "api/theaters/**").hasRole(Role.ADMIN.toString())
+                        .requestMatchers("api/theaters/**").permitAll()
+
                         .requestMatchers(HttpMethod.PATCH,"api/bookings/**").hasRole(Role.CASHIER.toString())
                         .requestMatchers("api/bookings", "api/bookings/**").authenticated()
+
                         .requestMatchers("api/context-broker/**").permitAll()
                         .anyRequest().permitAll())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))

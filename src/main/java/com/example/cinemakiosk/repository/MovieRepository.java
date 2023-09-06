@@ -39,6 +39,10 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
 
                     predicates.add(builder.equal(root.get(Movie_.id), movieShow.get(Movie_.id)));
                     predicates.add(builder.greaterThanOrEqualTo(show.get(Show_.date), new Date()));
+                    predicates.add(builder.or(
+                            builder.equal(theater.get(Theater_.deleted), false),
+                            builder.isNull(theater.get(Theater_.deleted)))
+                    );
 
                     if (dto.getCity() != null) {
                         predicates.add(builder.like(builder.lower(address.get(Address_.city)), "%" + dto.getCity().toLowerCase() + "%"));

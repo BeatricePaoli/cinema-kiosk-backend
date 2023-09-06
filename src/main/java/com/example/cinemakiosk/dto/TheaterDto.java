@@ -8,11 +8,12 @@ import org.springframework.beans.BeanUtils;
 public class TheaterDto {
     private Long id;
     private String name;
-    // TODO: da completare
+    private AddressDto address;
 
     public static TheaterDto toDto(Theater theater) {
         TheaterDto dto = new TheaterDto();
         BeanUtils.copyProperties(theater, dto);
+        dto.setAddress(AddressDto.toDto(theater.getAddress()));
         return dto;
     }
 }
