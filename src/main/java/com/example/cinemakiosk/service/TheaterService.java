@@ -11,7 +11,11 @@ public interface TheaterService {
 
     AutocompleteTheaterFilterDto getFilters(Long movieId);
 
+    TheaterDto getById(Long id);
+
     List<TicketTypeDto> getTicketTypes(Long id);
+
+    Long saveTheater(TheaterDto dto);
 
     Boolean deleteById(Long id);
 

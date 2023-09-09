@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TheaterRepository extends JpaRepository<Theater, Long> {
@@ -14,14 +15,21 @@ public interface TheaterRepository extends JpaRepository<Theater, Long> {
 
     @Query("SELECT t FROM Theater t " +
             "JOIN FETCH t.address " +
-            "JOIN FETCH t.bar " +
+            "LEFT JOIN FETCH t.bar " +
             "JOIN FETCH t.admin " +
             "WHERE t.admin.username = :username AND (t.deleted = FALSE OR t.deleted IS NULL)")
     List<Theater> findByAdmin(String username);
 
     @Query("SELECT t FROM Theater t " +
             "JOIN FETCH t.address " +
-            "JOIN FETCH t.bar " +
+            "LEFT JOIN FETCH t.bar " +
+            "JOIN FETCH t.admin " +
+            "WHERE t.id = :id")
+    Optional<Theater> findByIdWithFetch(Long id);
+
+    @Query("SELECT t FROM Theater t " +
+            "JOIN FETCH t.address " +
+            "LEFT JOIN FETCH t.bar " +
             "JOIN FETCH t.admin " +
             "WHERE t.deleted = FALSE OR t.deleted IS NULL")
     List<Theater> findAllWithFetch();

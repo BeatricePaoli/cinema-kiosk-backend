@@ -10,6 +10,8 @@ public class TheaterDto {
     private String name;
     private AddressDto address;
 
+    private String adminUsername;
+
     public static TheaterDto toDto(Theater theater) {
         TheaterDto dto = new TheaterDto();
         BeanUtils.copyProperties(theater, dto);

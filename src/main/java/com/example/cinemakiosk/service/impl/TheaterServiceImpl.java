@@ -1,10 +1,13 @@
 package com.example.cinemakiosk.service.impl;
 
 import com.example.cinemakiosk.dto.*;
+import com.example.cinemakiosk.model.Address;
 import com.example.cinemakiosk.model.Theater;
 import com.example.cinemakiosk.model.TicketType;
+import com.example.cinemakiosk.model.User;
 import com.example.cinemakiosk.repository.TheaterRepository;
 import com.example.cinemakiosk.repository.TicketTypeRepository;
+import com.example.cinemakiosk.repository.UserRepository;
 import com.example.cinemakiosk.service.TheaterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,9 @@ public class TheaterServiceImpl implements TheaterService {
 
     @Autowired
     private TicketTypeRepository ticketTypeRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public List<TheaterDto> getTheaters(String username) {
@@ -50,9 +56,57 @@ public class TheaterServiceImpl implements TheaterService {
     }
 
     @Override
+    public TheaterDto getById(Long id) {
+        Optional<Theater> theaterOpt = theaterRepository.findByIdWithFetch(id);
+        return theaterOpt.map(TheaterDto::toDto).orElse(null);
+    }
+
+    @Override
     public List<TicketTypeDto> getTicketTypes(Long id) {
         List<TicketType> ticketTypes = ticketTypeRepository.getByTheater(id);
         return ticketTypes.stream().map(TicketTypeDto::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public Long saveTheater(TheaterDto dto) {
+        Theater theater;
+        if (dto.getId() != null) {
+            Optional<Theater> theaterOpt = theaterRepository.findByIdWithFetch(dto.getId());
+            if (theaterOpt.isPresent()) {
+                theater = theaterOpt.get();
+            } else {
+                return null;
+            }
+        } else {
+            theater = new Theater();
+            Optional<User> userOpt = userRepository.findFirstByUsername(dto.getAdminUsername());
+            if (userOpt.isPresent()) {
+                theater.setAdmin(userOpt.get());
+            } else {
+                return null;
+            }
+        }
+        theater.setName(dto.getName());
+
+        Address address;
+        if (theater.getAddress() != null) {
+            address = theater.getAddress();
+        } else {
+            address = new Address();
+            address.setTheater(theater);
+            theater.setAddress(address);
+        }
+
+        AddressDto addressDto = dto.getAddress();
+
+        address.setCountry(addressDto.getCountry());
+        address.setCity(addressDto.getCity());
+        address.setNumber(addressDto.getNumber());
+        address.setZipCode(addressDto.getZipCode());
+        address.setStreet(addressDto.getStreet());
+
+        theater = theaterRepository.save(theater);
+        return theater.getId();
     }
 
     @Override

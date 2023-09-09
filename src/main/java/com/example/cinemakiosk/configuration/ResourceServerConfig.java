@@ -43,8 +43,9 @@ public class ResourceServerConfig {
                         .requestMatchers("api/shows", "api/shows/**").permitAll()
 
                         .requestMatchers("api/theaters").hasRole(Role.ADMIN.toString())
-                        .requestMatchers(HttpMethod.DELETE, "api/theaters/**").hasRole(Role.ADMIN.toString())
-                        .requestMatchers("api/theaters/**").permitAll()
+                        .requestMatchers("api/theaters/filter").permitAll()
+                        .requestMatchers("api/theaters/{id}").hasRole(Role.ADMIN.toString())
+                        .requestMatchers("api/theaters/{id}/tickets").permitAll()
 
                         .requestMatchers(HttpMethod.PATCH,"api/bookings/**").hasRole(Role.CASHIER.toString())
                         .requestMatchers("api/bookings", "api/bookings/**").authenticated()

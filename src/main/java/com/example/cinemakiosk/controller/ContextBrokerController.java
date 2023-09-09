@@ -28,12 +28,6 @@ public class ContextBrokerController {
         return ResponseEntity.noContent().build();
     }
 
-//    @PostMapping(value = "smartBand")
-//    public ResponseEntity<?> getNotificationSmartBand(HttpServletRequest request, @RequestBody String body) {
-//        log.info(body);
-//        return ResponseEntity.noContent().build();
-//    }
-
     @PostMapping(value = "cashRegister")
     public ResponseEntity<?> getNotificationCashRegister(@RequestBody NotificationDto<CashRegisterDto> dto) {
         log.info("Data notifica: {}", dto.getNotifiedAt());

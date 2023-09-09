@@ -1,6 +1,7 @@
 package com.example.cinemakiosk.controller;
 
 import com.example.cinemakiosk.dto.AutocompleteTheaterFilterDto;
+import com.example.cinemakiosk.dto.BookingDto;
 import com.example.cinemakiosk.dto.TheaterDto;
 import com.example.cinemakiosk.dto.TicketTypeDto;
 import com.example.cinemakiosk.service.TheaterService;
@@ -34,6 +35,20 @@ public class TheaterController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@AuthenticationPrincipal Jwt jwt, @PathVariable("id") Long id) {
+        String username = jwt.getClaimAsString(JwtClaimConstants.username);
+
+        if (theaterService.checkIsAdminOfTheater(username, id)) {
+            TheaterDto result = theaterService.getById(id);
+            if (result == null) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(result);
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
     @GetMapping("/{id}/tickets")
     public ResponseEntity<?> getTicketTypes(@PathVariable("id") Long id) {
         List<TicketTypeDto> result = theaterService.getTicketTypes(id);
@@ -42,6 +57,22 @@ public class TheaterController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> saveTheater(@AuthenticationPrincipal Jwt jwt, @RequestBody TheaterDto dto) {
+        String username = jwt.getClaimAsString(JwtClaimConstants.username);
+        dto.setAdminUsername(username);
+
+        if (dto.getId() == null || theaterService.checkIsAdminOfTheater(username, dto.getId())) {
+            Long theaterId = theaterService.saveTheater(dto);
+
+            if (theaterId == null) {
+                return ResponseEntity.badRequest().build();
+            }
+            return ResponseEntity.ok(theaterId);
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @DeleteMapping("/{id}")
