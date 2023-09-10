@@ -8,6 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@DiscriminatorValue("cash_register")
+@DiscriminatorValue(DeviceType.CASHREGISTER)
 public class CashRegister extends Device {
 }

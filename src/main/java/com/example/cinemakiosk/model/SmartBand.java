@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@DiscriminatorValue("smartband")
+@DiscriminatorValue(DeviceType.SMARTBAND)
 public class SmartBand extends Device {
 
     private Boolean deleted;
