@@ -47,6 +47,8 @@ public class ResourceServerConfig {
                         .requestMatchers("api/theaters/{id}").hasRole(Role.ADMIN.toString())
                         .requestMatchers("api/theaters/{id}/tickets").permitAll()
 
+                        .requestMatchers("api/devices/**").hasRole(Role.ADMIN.toString())
+
                         .requestMatchers(HttpMethod.PATCH,"api/bookings/**").hasRole(Role.CASHIER.toString())
                         .requestMatchers("api/bookings", "api/bookings/**").authenticated()
 
