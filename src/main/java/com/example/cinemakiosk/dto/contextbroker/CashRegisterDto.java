@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CashRegisterDto extends BaseEntityDto {
-    private PropertyDto<String> cashRegisterType; // TODO: enum?
+    private PropertyDto<String> cashRegisterType;
     private RelationshipDto device;
     private RelationshipDto product;
     private PropertyDto<Integer> quantity;

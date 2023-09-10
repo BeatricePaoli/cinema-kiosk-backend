@@ -169,8 +169,7 @@ public class BookingServiceImpl implements BookingService {
             User cashier = cashierOpt.get();
 
             if (cashier.getTheaterCashier() != null && Objects.equals(cashier.getTheaterCashier().getId(), booking.getShow().getScreen().getTheater().getId())) {
-                // TODO: gestione created vs paid
-                if (booking.getStatus() == BookingStatus.CREATED || booking.getStatus() == BookingStatus.PAID) {
+                if (booking.getStatus() == BookingStatus.CREATED) {
 
                     List<SmartBandCompactDto> smartbands = contextBrokerService.searchSmartBands();
                     List<SmartBand> theaterSmartbands = smartBandRepository.findByTheaterId(
