@@ -24,6 +24,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "JOIN FETCH b.show.screen " +
             "JOIN FETCH b.show.screen.theater " +
             "JOIN FETCH b.show.screen.theater.address " +
+            "LEFT JOIN FETCH b.show.screen.theater.bar " +
+            "JOIN FETCH b.show.screen.theater.admin " +
             "JOIN FETCH b.user " +
             "WHERE b.id = :id AND b.status != 'CANCELED'")
     Optional<Booking> findByIdWithFetch(Long id);
@@ -34,6 +36,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "JOIN FETCH b.show.screen " +
             "JOIN FETCH b.show.screen.theater " +
             "JOIN FETCH b.show.screen.theater.address " +
+            "LEFT JOIN FETCH b.show.screen.theater.bar " +
+            "JOIN FETCH b.show.screen.theater.admin " +
             "JOIN FETCH b.user " +
             "WHERE b.user.username = :username AND b.status != 'CANCELED'")
     List<Booking> getBookings(String username);

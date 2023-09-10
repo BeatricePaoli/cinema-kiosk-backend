@@ -219,6 +219,7 @@ public class BookingServiceImpl implements BookingService {
         Show show = booking.getShow();
         Movie movie = show.getMovie();
         Theater theater = show.getScreen().getTheater();
+        User user = booking.getUser();
 
         BookingDto dto = new BookingDto();
         dto.setId(booking.getId());
@@ -238,6 +239,8 @@ public class BookingServiceImpl implements BookingService {
         dto.setSeats(seats);
 
         dto.setCodeUrl(baseUrl + "/api/bookings/code/" + booking.getId());
+
+        dto.setUsername(user.getUsername());
 
         return dto;
     }
