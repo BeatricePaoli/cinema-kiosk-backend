@@ -20,23 +20,20 @@ public class DeviceActivity {
     @ManyToOne
     private SmartBand smartBand;
 
-    private Boolean hasEnteredBar;
-    private Boolean hasEnteredWrongRoom;
-    private Boolean hasLeftTheater;
-
     @Temporal(TemporalType.TIMESTAMP)
-    private Date activationTms;
+    private Date tms;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date deActivationTms;
+    private String emitterSerial;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date lastUpdateTms;
+    @Enumerated(EnumType.STRING)
+    private DeviceActivityEvent eventCode;
 
     @ManyToOne
     @JoinColumn(name = "booking_id")
     private Booking booking;
 
-    @OneToMany(mappedBy = "deviceActivity", cascade = CascadeType.ALL)
-    private List<BarOrder> barOrders;
+    private Integer quantity;
+
+    @ManyToOne
+    private BarProduct product;
 }

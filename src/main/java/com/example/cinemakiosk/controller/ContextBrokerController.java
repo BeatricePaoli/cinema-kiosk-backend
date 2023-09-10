@@ -24,7 +24,7 @@ public class ContextBrokerController {
     public ResponseEntity<?> getNotificationSmartBand(@RequestBody NotificationDto<SmartBandDto> dto) {
         log.info("Data notifica: {}, seriale {}", dto.getNotifiedAt(), dto.getData().get(0).getEmitterSerial().getValue());
         log.info("ON: {}", dto.getData().get(0).toString());
-        deviceActivityService.update(dto);
+        deviceActivityService.addEmitterLog(dto);
         return ResponseEntity.noContent().build();
     }
 

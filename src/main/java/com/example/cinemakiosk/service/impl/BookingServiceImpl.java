@@ -187,7 +187,7 @@ public class BookingServiceImpl implements BookingService {
                         toActivate.stream()
                                 .takeWhile(s -> contextBrokerService.sendCommand(s.getContextBrokerId(), "on", "true"))
                                 .forEach(s -> {
-                                    deviceActivityService.create(s, booking);
+                                    deviceActivityService.addActivationLog(s, booking);
                         });
 
                         booking.setStatus(BookingStatus.CHECKEDIN);

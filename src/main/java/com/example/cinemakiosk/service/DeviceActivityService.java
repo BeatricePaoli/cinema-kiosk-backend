@@ -7,7 +7,7 @@ import com.example.cinemakiosk.model.SmartBand;
 
 public interface DeviceActivityService {
 
-    void create(SmartBand smartBand, Booking booking);
+    void addActivationLog(SmartBand smartBand, Booking booking);
 
-    void update(NotificationDto<SmartBandDto> dto);
+    void addEmitterLog(NotificationDto<SmartBandDto> dto);
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,49 +26,51 @@ public class DeviceActivityServiceImpl implements DeviceActivityService {
     private ScreenRepository screenRepository;
 
     @Override
-    public void create(SmartBand smartBand, Booking booking) {
+    public void addActivationLog(SmartBand smartBand, Booking booking) {
         DeviceActivity activity = new DeviceActivity();
-        activity.setActivationTms(new Date());
+        activity.setTms(new Date());
         activity.setBooking(booking);
         activity.setSmartBand(smartBand);
+        activity.setEventCode(DeviceActivityEvent.ACTIVATION);
 
         deviceActivityRepository.save(activity);
     }
 
     // TODO: gestione ordini bar (altro metodo) e disattivazione (altro metodo)
     @Override
-    public void update(NotificationDto<SmartBandDto> dto) {
+    public void addEmitterLog(NotificationDto<SmartBandDto> dto) {
         dto.getData().stream().forEach(s -> {
-            List<DeviceActivity> activities = deviceActivityRepository.findActiveBySmartBandId(s.getId());
-            if (activities.size() == 1) {
-                DeviceActivity activity = activities.get(0);
+            Optional<DeviceActivity> activityOpt = deviceActivityRepository.findLastBySmartBandId(s.getId());
+            if (activityOpt.isPresent()) {
+                DeviceActivity activity = activityOpt.get();
 
-                Theater theater = activity.getSmartBand().getTheater();
-                Screen showScreen = activity.getBooking().getShow().getScreen();
-                List<Screen> screens = screenRepository.findByTheaterId(theater.getId());
-                Bar bar = theater.getBar();
+                if (activity.getEventCode() != DeviceActivityEvent.DEACTIVATION) {
+                    DeviceActivity newActivity = new DeviceActivity();
 
-                String newEmitterSerial = s.getEmitterSerial().getValue();
-                boolean hasEnteredWrongRoom = screens.stream().anyMatch(sc -> Objects.equals(sc.getEmitterSerial(), newEmitterSerial) && !Objects.equals(sc.getId(), showScreen.getId()));
+                    newActivity.setTms(s.getEmitterSerial().getObservedAt());
+                    newActivity.setEmitterSerial(s.getEmitterSerial().getValue());
+                    newActivity.setBooking(activity.getBooking());
+                    newActivity.setSmartBand(activity.getSmartBand());
 
-                boolean updated = false;
-                if (Objects.equals(newEmitterSerial, bar.getEmitterSerial())) {
-                    activity.setHasEnteredBar(true);
-                    updated = true;
-                } else if (hasEnteredWrongRoom) {
-                    activity.setHasEnteredWrongRoom(true);
-                    updated = true;
-                } else if (Objects.equals(newEmitterSerial, "")) {
-                    activity.setHasLeftTheater(true);
-                    updated = true;
-                }
+                    Theater theater = activity.getSmartBand().getTheater();
+                    Screen showScreen = activity.getBooking().getShow().getScreen();
+                    List<Screen> screens = screenRepository.findByTheaterId(theater.getId());
+                    Bar bar = theater.getBar();
 
-                if (updated) {
-                    activity.setLastUpdateTms(s.getEmitterSerial().getObservedAt());
-                    deviceActivityRepository.save(activity);
+                    String newEmitterSerial = s.getEmitterSerial().getValue();
+                    boolean hasEnteredWrongRoom = screens.stream().anyMatch(sc -> Objects.equals(sc.getEmitterSerial(), newEmitterSerial) && !Objects.equals(sc.getId(), showScreen.getId()));
+
+                    if (Objects.equals(newEmitterSerial, bar.getEmitterSerial())) {
+                        newActivity.setEventCode(DeviceActivityEvent.ENTERED_BAR);
+                    } else if (hasEnteredWrongRoom) {
+                        newActivity.setEventCode(DeviceActivityEvent.WRONG_ROOM);
+                    } else {
+                        newActivity.setEventCode(DeviceActivityEvent.ROOM_CHANGE);
+                    }
+                    deviceActivityRepository.save(newActivity);
                 }
             } else {
-                log.error("Update device activity error: no activity found or multiple active activities found");
+                log.error("No activation log found for the device {}", s.getId());
             }
         });
     }
