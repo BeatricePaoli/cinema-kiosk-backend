@@ -49,7 +49,7 @@ public class DeviceServiceImpl implements DeviceService {
         Optional<SmartBand> smartbandOpt = smartBandRepository.findById(id);
         if (deviceRepository.deviceBelongsToAdminOrCashier(id, username) && smartbandOpt.isPresent()) {
             SmartBand smartBand = smartbandOpt.get();
-            if (contextBrokerService.sendCommand(smartBand.getContextBrokerId(), "on", "true")) {
+            if (contextBrokerService.sendCommand(smartBand.getContextBrokerId(), "on", "false")) {
                 return deviceActivityService.addDeactivationLog(smartBand);
             }
         }
