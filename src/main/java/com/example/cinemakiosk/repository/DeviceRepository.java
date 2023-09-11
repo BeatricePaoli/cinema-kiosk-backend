@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface DeviceRepository extends JpaRepository<Device, Long> {
 
     @Query(value = "SELECT d.id as id, d.context_broker_id as contextBrokerId, (" +
-            "SELECT CASE WHEN da.event_code <> 'DEACTIVATION' THEN false ELSE true END " +
+            "SELECT CASE WHEN da.event_code <> 'DEACTIVATION' THEN true ELSE false END " +
             "FROM device_activity da " +
             "WHERE da.smart_band_id = d.id " +
             "ORDER BY da.tms DESC " +
@@ -25,7 +25,7 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
     List<DeviceInterface> search(Long theaterId, String type);
 
     @Query(value = "SELECT d.id as id, d.context_broker_id as contextBrokerId, (" +
-            "SELECT CASE WHEN da.event_code <> 'DEACTIVATION' THEN false ELSE true END " +
+            "SELECT CASE WHEN da.event_code <> 'DEACTIVATION' THEN true ELSE false END " +
             "FROM device_activity da " +
             "WHERE da.smart_band_id = d.id " +
             "ORDER BY da.tms DESC " +
@@ -34,4 +34,11 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
             "FROM device d " +
             "WHERE d.id = :id", nativeQuery = true)
     Optional<DeviceInterface> findDtoById(Long id);
+
+    @Query("SELECT new java.lang.Boolean(count(*) > 0) " +
+            "FROM Device d " +
+            "LEFT JOIN d.theater.cashiers c " +
+            "WHERE d.id = :id " +
+            "AND (d.theater.admin.username = :username OR c.username = :username)")
+    Boolean deviceBelongsToAdminOrCashier(Long id, String username);
 }

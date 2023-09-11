@@ -68,7 +68,7 @@ public class BookingController {
     @PatchMapping("/{id}")
     public ResponseEntity<?> validateById(@AuthenticationPrincipal Jwt jwt, @PathVariable("id") Long id) {
         String username = jwt.getClaimAsString(JwtClaimConstants.username);
-        Boolean result = bookingService.validateById(id,username);
+        Boolean result = bookingService.validateById(id, username);
         if (!result) {
             return ResponseEntity.badRequest().build();
         }

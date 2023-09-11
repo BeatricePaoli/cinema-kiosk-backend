@@ -9,4 +9,6 @@ public interface DeviceService {
     List<DeviceDto> search(DeviceFilterDto dto);
 
     DeviceDto getById(Long id);
+
+    boolean deactivate(Long id, String username);
 }
