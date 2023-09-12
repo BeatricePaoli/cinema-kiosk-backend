@@ -1,9 +1,11 @@
 package com.example.cinemakiosk.service.impl;
 
 import com.example.cinemakiosk.dto.*;
+import com.example.cinemakiosk.dto.contextbroker.CashRegisterDto;
 import com.example.cinemakiosk.dto.contextbroker.NotificationDto;
 import com.example.cinemakiosk.dto.contextbroker.SmartBandDto;
 import com.example.cinemakiosk.model.*;
+import com.example.cinemakiosk.repository.BarProductRepository;
 import com.example.cinemakiosk.repository.DeviceActivityRepository;
 import com.example.cinemakiosk.repository.ScreenRepository;
 import com.example.cinemakiosk.service.DeviceActivityService;
@@ -34,6 +36,9 @@ public class DeviceActivityServiceImpl implements DeviceActivityService {
     private ScreenRepository screenRepository;
 
     @Autowired
+    private BarProductRepository barProductRepository;
+
+    @Autowired
     private MovieService movieService;
 
     @Override
@@ -47,7 +52,6 @@ public class DeviceActivityServiceImpl implements DeviceActivityService {
         deviceActivityRepository.save(activity);
     }
 
-    // TODO: gestione ordini bar (altro metodo) e disattivazione (altro metodo)
     @Override
     public void addEmitterLog(NotificationDto<SmartBandDto> dto) {
         dto.getData().stream().forEach(s -> {
@@ -78,12 +82,68 @@ public class DeviceActivityServiceImpl implements DeviceActivityService {
                     } else {
                         newActivity.setEventCode(DeviceActivityEvent.ROOM_CHANGE);
                     }
-                    deviceActivityRepository.save(newActivity);
+
+                    Boolean alreadyPresent = deviceActivityRepository.isAlreadyPresent(s.getId(), newActivity.getTms(), newActivity.getEventCode(),
+                            newActivity.getEmitterSerial(), null, null);
+                    if (!alreadyPresent) {
+                        deviceActivityRepository.save(newActivity);
+                    } else {
+                        log.warn("Log already present");
+                    }
                 } else {
                     log.error("Deactivation log found for device {}", s.getId());
                 }
             } else {
                 log.error("No activation log found for the device {}", s.getId());
+            }
+        });
+    }
+
+    @Override
+    public void addPurchaseLog(NotificationDto<CashRegisterDto> dto) {
+        dto.getData().stream().forEach(c -> {
+            if (c.getDevice() != null) {
+                Optional<DeviceActivity> activityOpt = deviceActivityRepository.findLastBySmartBandId(c.getDevice().getObject());
+
+                if (activityOpt.isPresent()) {
+                    DeviceActivity activity = activityOpt.get();
+
+                    if (activity.getEventCode() != DeviceActivityEvent.DEACTIVATION) {
+                        Theater theater = activity.getSmartBand().getTheater();
+                        List<BarProduct> products = barProductRepository.findByProductCodeAndTheater(
+                                c.getProductCode().getValue(), theater.getId()
+                        );
+
+                        if (products.size() == 1) {
+                            DeviceActivity newActivity = new DeviceActivity();
+
+                            newActivity.setTms(c.getProductCode().getObservedAt());
+                            newActivity.setBooking(activity.getBooking());
+                            newActivity.setSmartBand(activity.getSmartBand());
+                            newActivity.setQuantity(c.getQuantity().getValue());
+                            newActivity.setProduct(products.get(0));
+                            newActivity.setEventCode(DeviceActivityEvent.BAR_PURCHASE);
+
+                            Boolean alreadyPresent = deviceActivityRepository.isAlreadyPresent(c.getDevice().getObject(),
+                                    newActivity.getTms(), newActivity.getEventCode(), newActivity.getEmitterSerial(),
+                                    newActivity.getProduct().getId(), newActivity.getQuantity());
+                            if (!alreadyPresent) {
+                                deviceActivityRepository.save(newActivity);
+                            } else {
+                                log.warn("Log already present");
+                            }
+                            deviceActivityRepository.save(newActivity);
+                        } else {
+                            log.error("Error: found {} bar products with code {} for theater with id {}", products.size(), c.getProductCode().getValue(), theater.getId());
+                        }
+                    } else {
+                        log.error("Deactivation log found for device {}", c.getDevice().getObject());
+                    }
+                } else {
+                    log.error("No activation log found for the device {}", c.getDevice().getObject());
+                }
+            } else {
+                log.error("No smartband in the cash register notification");
             }
         });
     }

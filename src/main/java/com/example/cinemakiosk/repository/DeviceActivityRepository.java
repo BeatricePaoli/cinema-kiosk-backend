@@ -1,10 +1,12 @@
 package com.example.cinemakiosk.repository;
 
 import com.example.cinemakiosk.model.DeviceActivity;
+import com.example.cinemakiosk.model.DeviceActivityEvent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,7 +35,16 @@ public interface DeviceActivityRepository extends JpaRepository<DeviceActivity, 
             "LEFT JOIN FETCH b.show.screen.theater.bar " +
             "JOIN FETCH b.show.screen.theater.admin " +
             "JOIN FETCH b.user " +
+            "LEFT JOIN FETCH da.product " +
             "WHERE da.smartBand.id = :id " +
             "ORDER BY da.tms DESC ")
     List<DeviceActivity> findBySmartbandId(Long id);
+
+    @Query("SELECT new java.lang.Boolean(count(*) > 0) " +
+            "FROM DeviceActivity da " +
+            "WHERE da.smartBand.contextBrokerId = :id AND da.tms = :tms AND da.eventCode = :event " +
+            "AND ((:emitterSerial IS NULL AND da.emitterSerial IS NULL) OR da.emitterSerial = :emitterSerial) " +
+            "AND ((:productId IS NULL AND da.product.id IS NULL) OR da.product.id = :productId) " +
+            "AND ((:quantity IS NULL AND da.quantity IS NULL) OR da.quantity = :quantity)")
+    Boolean isAlreadyPresent(String id, Date tms, DeviceActivityEvent event, String emitterSerial, Long productId, Integer quantity);
 }

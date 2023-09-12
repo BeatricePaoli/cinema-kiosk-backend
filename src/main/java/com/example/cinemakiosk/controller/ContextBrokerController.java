@@ -22,20 +22,15 @@ public class ContextBrokerController {
 
     @PostMapping(value = "smartBand")
     public ResponseEntity<?> getNotificationSmartBand(@RequestBody NotificationDto<SmartBandDto> dto) {
-        log.info("Data notifica: {}, seriale {}", dto.getNotifiedAt(), dto.getData().get(0).getEmitterSerial().getValue());
-        log.info("ON: {}", dto.getData().get(0).toString());
+        log.info("Data notifica smartband: {}", dto.getNotifiedAt());
         deviceActivityService.addEmitterLog(dto);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping(value = "cashRegister")
     public ResponseEntity<?> getNotificationCashRegister(@RequestBody NotificationDto<CashRegisterDto> dto) {
-        log.info("Data notifica: {}", dto.getNotifiedAt());
-        log.info("{}", dto.getData().get(0).getCashRegisterType().getValue());
-        log.info("{}", dto.getData().get(0).getId());
-        log.info("{}", dto.getData().get(0).getDevice().getObject());
-        log.info("{}", dto.getData().get(0).getProduct().getObject());
-        log.info("{}", dto.getData().get(0).getQuantity().getValue());
+        log.info("Data notifica cassa: {}", dto.getNotifiedAt());
+        deviceActivityService.addPurchaseLog(dto);
         return ResponseEntity.noContent().build();
     }
 }

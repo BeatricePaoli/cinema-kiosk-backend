@@ -10,6 +10,6 @@ import lombok.EqualsAndHashCode;
 public class CashRegisterDto extends BaseEntityDto {
     private PropertyDto<String> cashRegisterType;
     private RelationshipDto device;
-    private RelationshipDto product;
+    private PropertyDto<String> productCode;
     private PropertyDto<Integer> quantity;
 }

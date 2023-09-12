@@ -1,6 +1,7 @@
 package com.example.cinemakiosk.service;
 
 import com.example.cinemakiosk.dto.DeviceActivityDto;
+import com.example.cinemakiosk.dto.contextbroker.CashRegisterDto;
 import com.example.cinemakiosk.dto.contextbroker.NotificationDto;
 import com.example.cinemakiosk.dto.contextbroker.SmartBandDto;
 import com.example.cinemakiosk.model.Booking;
@@ -12,6 +13,7 @@ public interface DeviceActivityService {
 
     void addActivationLog(SmartBand smartBand, Booking booking);
     void addEmitterLog(NotificationDto<SmartBandDto> dto);
+    void addPurchaseLog(NotificationDto<CashRegisterDto> dto);
     Boolean addDeactivationLog(SmartBand smartBand);
 
     List<DeviceActivityDto> getActivities(Long id);
